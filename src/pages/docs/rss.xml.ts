@@ -17,6 +17,20 @@ const imagesGlob = import.meta.glob<{ default: ImageMetadata }>(
   '/src/content/docs/**/*.{jpeg,jpg,png,gif,avif,webp}'
 )
 
+const isRemoteURL = (url: string) =>
+  /^(?:[a-z][a-z\d+.-]*:)?\/\//i.test(url) || url.startsWith('data:')
+
+const getLocalImageImporter = (postId: string, imageURL: string) => {
+  const [cleanURL] = imageURL.split(/[?#]/)
+  const relativePath = decodeURI(cleanURL.replace(/^\.\//, ''))
+  const parentDir = postId.split('/').slice(0, -1).join('/')
+  const candidateDirs = Array.from(new Set([postId, parentDir].filter(Boolean)))
+
+  return candidateDirs
+    .map((dir) => imagesGlob[`/src/content/docs/${dir}/${relativePath}`])
+    .find(Boolean)
+}
+
 const renderContent = async (post: CollectionEntry<'docs'>, site: URL) => {
   // Replace image links with the correct path
   function remarkReplaceImageLink() {
@@ -26,14 +40,16 @@ const renderContent = async (post: CollectionEntry<'docs'>, site: URL) => {
     return async function (tree: Root) {
       const promises: Promise<void>[] = []
       visit(tree, 'image', (node) => {
-        if (node.url.startsWith('/images')) {
-          node.url = `${site}${node.url.replace('/', '')}`
+        if (isRemoteURL(node.url)) return
+
+        if (node.url.startsWith('/')) {
+          node.url = new URL(node.url, site).href
         } else {
-          const imagePathPrefix = `/src/content/docs/${post.id}/${node.url.replace('./', '')}`
-          const promise = imagesGlob[imagePathPrefix]?.().then(async (res) => {
+          const importer = getLocalImageImporter(post.id, node.url)
+          const promise = importer?.().then(async (res) => {
             const imagePath = res?.default
             if (imagePath) {
-              node.url = `${site}${(await getImage({ src: imagePath })).src.replace('/', '')}`
+              node.url = new URL((await getImage({ src: imagePath })).src, site).href
             }
           })
           if (promise) promises.push(promise)
@@ -66,10 +82,10 @@ const GET = async (context: AstroGlobal) => {
     // Contents
     title: config.title,
     description: config.description,
-    site: import.meta.env.SITE,
+    site: siteUrl.href,
     items: await Promise.all(
       allPostsByDate.map(async (post) => ({
-        link: `/docs/${post.id}`,
+        link: new URL(`/docs/${post.id}`, siteUrl).href,
         content: await renderContent(post, siteUrl),
         ...post.data
       }))

@@ -7,7 +7,7 @@ tags:
   - Generative Recommendation
 ---
 
-# Generativa Recommendation
+# Generative Recommendation
 
 ## Recommendation as Language Processing (RLP): A Unified Pretrain, Personalized Prompt & Predict Paradigm (P5)
 [[2203.13366] Recommendation as Language Processing (RLP): A Unified Pretrain, Personalized Prompt & Predict Paradigm (P5)](https://arxiv.org/abs/2203.13366)

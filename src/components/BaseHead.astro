@@ -10,8 +10,9 @@ type Props = SiteMeta
 const { articleDate, description, ogImage, title } = Astro.props
 
 const siteTitle = `${title} ${config.titleDelimiter} ${config.title}`
-const canonicalURL = new URL(Astro.url.pathname, Astro.site)
+const canonicalURL = new URL(Astro.url.pathname, Astro.site).href
 const socialImageURL = new URL(ogImage ? ogImage : '/images/social-card.png', Astro.url).href
+const rssURL = new URL('/rss.xml', Astro.site).href
 ---
 
 <meta charset='utf-8' />
@@ -93,56 +94,61 @@ const socialImageURL = new URL(ogImage ? ogImage : '/images/social-card.png', As
 }
 
 {/* Twitter */}
-<meta content='summary_large_image' property='twitter:card' />
-<meta content={canonicalURL} property='twitter:url' />
-<meta content={title} property='twitter:title' />
-<meta content={description} property='twitter:description' />
-<meta content={socialImageURL} property='twitter:image' />
+<meta content='summary_large_image' name='twitter:card' />
+<meta content={canonicalURL} name='twitter:url' />
+<meta content={title} name='twitter:title' />
+<meta content={description} name='twitter:description' />
+<meta content={socialImageURL} name='twitter:image' />
 
 {/* Sitemap */}
 <link href='/sitemap-index.xml' rel='sitemap' />
 
 {/* RSS auto-discovery */}
-<link
-  rel='alternate'
-  type='application/rss+xml'
-  title={config.title}
-  href={`${Astro.site}rss.xml`}
-/>
+<link rel='alternate' type='application/rss+xml' title={config.title} href={rssURL} />
 
 <meta content={Astro.generator} name='generator' />
 
 {/* JSON-LD Structured Data */}
-<script type='application/ld+json' set:html={JSON.stringify({
-  '@context': 'https://schema.org',
-  '@type': 'WebSite',
-  name: config.title,
-  url: Astro.site,
-  description: config.description,
-  author: {
-    '@type': 'Person',
-    name: config.author
-  }
-})} />
-{articleDate && (
-  <script type='application/ld+json' set:html={JSON.stringify({
+<script
+  is:inline
+  type='application/ld+json'
+  set:html={JSON.stringify({
     '@context': 'https://schema.org',
-    '@type': 'Article',
-    headline: title,
-    description: description,
-    datePublished: articleDate,
+    '@type': 'WebSite',
+    name: config.title,
+    url: Astro.site,
+    description: config.description,
     author: {
       '@type': 'Person',
       name: config.author
-    },
-    publisher: {
-      '@type': 'Person',
-      name: config.author
-    },
-    url: canonicalURL.href,
-    image: socialImageURL
-  })} />
-)}
+    }
+  })}
+/>
+{
+  articleDate && (
+    <script
+      is:inline
+      type='application/ld+json'
+      set:html={JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: title,
+        description: description,
+        datePublished: articleDate,
+        author: {
+          '@type': 'Person',
+          name: config.author
+        },
+        publisher: {
+          '@type': 'Person',
+          name: config.author
+        },
+        url: canonicalURL,
+        image: socialImageURL
+      })}
+    />
+  )
+}
 
 {/* Styles */}
 <link rel='stylesheet' href='/styles/global.css' />
@@ -150,14 +156,21 @@ const socialImageURL = new URL(ogImage ? ogImage : '/images/social-card.png', As
 {/* View transitions */}
 <ClientRouter />
 <script is:inline>
-  document.addEventListener('astro:after-swap', () => {
+  const zeroHourHeadState = globalThis
+
+  function temporarilyDisableTransitions() {
     const style = document.createElement('style')
     style.textContent = `* { transition: none !important; }`
     document.head.appendChild(style)
     setTimeout(() => {
       style.remove()
     }, 100)
-  })
+  }
+
+  if (!zeroHourHeadState.__zeroHourDisableTransitionBound) {
+    document.addEventListener('astro:after-swap', temporarilyDisableTransitions)
+    zeroHourHeadState.__zeroHourDisableTransitionBound = true
+  }
 </script>
 
 {

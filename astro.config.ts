@@ -103,8 +103,9 @@ export default defineConfig({
     ],
     server: {
       watch: {
+        ignored: ['**/.astro/**', '**/.vercel/**', '**/dist/**', '**/node_modules/**'],
         usePolling: true,
-        interval: 2000  // 增加到2秒，减少CPU占用
+        interval: 2000 // 增加到2秒，减少CPU占用
       }
     }
   }

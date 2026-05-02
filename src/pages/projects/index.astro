@@ -1,6 +1,4 @@
 ---
-import { Image } from 'astro:assets'
-
 import { Button, Icon } from 'astro-pure/user'
 import PageLayout from '@/layouts/CommonPage.astro'
 import ProjectSection from '@/components/projects/ProjectSection.astro'
@@ -23,11 +21,13 @@ const headings = [
 <PageLayout title='Projects' {headings} view>
   <p>Github Activities:</p>
   <p>
-    <Image
+    <img
       src='https://ghchart.rshah.org/659eb9/ZeroHour-Z'
       alt='github activities'
-      inferSize
+      width='663'
+      height='104'
       loading='lazy'
+      decoding='async'
     />
   </p>
   <p>
@@ -45,10 +45,8 @@ const headings = [
         name: 'raspberry',
         description:
           'based on raspberry pi 5, detect the circle, the cross and different colors with opencv and yolo',
-        links: [
-          { type: 'github', href: 'https://github.com/ZeroHour-Z/raspberry' },
-        ]
-      },
+        links: [{ type: 'github', href: 'https://github.com/ZeroHour-Z/raspberry' }]
+      }
       // {
       //   name: '💄 PKU Art',
       //   description: 'A script to beautify pku course website',

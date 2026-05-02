@@ -17,6 +17,20 @@ const imagesGlob = import.meta.glob<{ default: ImageMetadata }>(
   '/src/content/blog/**/*.{jpeg,jpg,png,gif,avif,webp}'
 )
 
+const isRemoteURL = (url: string) =>
+  /^(?:[a-z][a-z\d+.-]*:)?\/\//i.test(url) || url.startsWith('data:')
+
+const getLocalImageImporter = (postId: string, imageURL: string) => {
+  const [cleanURL] = imageURL.split(/[?#]/)
+  const relativePath = decodeURI(cleanURL.replace(/^\.\//, ''))
+  const parentDir = postId.split('/').slice(0, -1).join('/')
+  const candidateDirs = Array.from(new Set([postId, parentDir].filter(Boolean)))
+
+  return candidateDirs
+    .map((dir) => imagesGlob[`/src/content/blog/${dir}/${relativePath}`])
+    .find(Boolean)
+}
+
 const renderContent = async (post: CollectionEntry<'blog'>, site: URL) => {
   // Replace image links with the correct path
   function remarkReplaceImageLink() {
@@ -26,14 +40,16 @@ const renderContent = async (post: CollectionEntry<'blog'>, site: URL) => {
     return async function (tree: Root) {
       const promises: Promise<void>[] = []
       visit(tree, 'image', (node) => {
-        if (node.url.startsWith('/images')) {
-          node.url = `${site}${node.url.replace('/', '')}`
+        if (isRemoteURL(node.url)) return
+
+        if (node.url.startsWith('/')) {
+          node.url = new URL(node.url, site).href
         } else {
-          const imagePathPrefix = `/src/content/blog/${post.id}/${node.url.replace('./', '')}`
-          const promise = imagesGlob[imagePathPrefix]?.().then(async (res) => {
+          const importer = getLocalImageImporter(post.id, node.url)
+          const promise = importer?.().then(async (res) => {
             const imagePath = res?.default
             if (imagePath) {
-              node.url = `${site}${(await getImage({ src: imagePath })).src.replace('/', '')}`
+              node.url = new URL((await getImage({ src: imagePath })).src, site).href
             }
           })
           if (promise) promises.push(promise)
@@ -66,18 +82,26 @@ const GET = async (context: AstroGlobal) => {
     // Contents
     title: config.title,
     description: config.description,
-    site: import.meta.env.SITE,
+    site: siteUrl.href,
     items: await Promise.all(
-      allPostsByDate.map(async (post) => ({
-        pubDate: post.data.publishDate,
-        link: `/blog/${post.id}`,
-        customData: post.data.heroImage?.src
-          ? `<h:img src="${typeof post.data.heroImage.src === 'string' ? post.data.heroImage.src : post.data.heroImage.src.src}" />
-          <enclosure url="${typeof post.data.heroImage.src === 'string' ? post.data.heroImage.src : post.data.heroImage.src.src}" />`
-          : '',
-        content: await renderContent(post, siteUrl),
-        ...post.data
-      }))
+      allPostsByDate.map(async (post) => {
+        const heroImageSrc = post.data.heroImage?.src
+        const heroImageURL = heroImageSrc
+          ? new URL(typeof heroImageSrc === 'string' ? heroImageSrc : heroImageSrc.src, siteUrl)
+              .href
+          : undefined
+
+        return {
+          pubDate: post.data.publishDate,
+          link: new URL(`/blog/${post.id}`, siteUrl).href,
+          customData: heroImageURL
+            ? `<h:img src="${heroImageURL}" />
+          <enclosure url="${heroImageURL}" />`
+            : '',
+          content: await renderContent(post, siteUrl),
+          ...post.data
+        }
+      })
     )
   })
 }

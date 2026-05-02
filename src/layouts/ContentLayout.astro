@@ -75,15 +75,20 @@ const { meta, highlightColor, back = '/', ...props } = Astro.props
 </PageLayout>
 
 <script>
+  const zeroHourContentLayoutState = globalThis as typeof globalThis & {
+    __zeroHourSidebarBound?: boolean
+  }
+
   function initSidebar() {
-    const sidebarButton = document.getElementById('sidebar-btn')
+    const sidebarButton = document.getElementById('sidebar-btn') as HTMLElement | null
     const sidebar = document.getElementById('sidebar')
     const sidebarShade = document.getElementById('sidebar-shade') as HTMLElement
 
-    if (sidebarShade) {
+    if (sidebarShade && sidebarShade.dataset.sidebarBound !== 'true') {
       sidebarShade.addEventListener('click', () => {
         toggleSidebar()
       })
+      sidebarShade.dataset.sidebarBound = 'true'
     }
 
     function toggleSidebar() {
@@ -96,13 +101,19 @@ const { meta, highlightColor, back = '/', ...props } = Astro.props
       }
     }
 
-    sidebarButton?.addEventListener('click', () => {
-      toggleSidebar()
-    })
+    if (sidebarButton && sidebarButton.dataset.sidebarBound !== 'true') {
+      sidebarButton.addEventListener('click', () => {
+        toggleSidebar()
+      })
+      sidebarButton.dataset.sidebarBound = 'true'
+    }
   }
 
   initSidebar()
-  document.addEventListener('astro:after-swap', initSidebar)
+  if (!zeroHourContentLayoutState.__zeroHourSidebarBound) {
+    document.addEventListener('astro:after-swap', initSidebar)
+    zeroHourContentLayoutState.__zeroHourSidebarBound = true
+  }
 </script>
 <style>
   @media (min-width: 769px) {

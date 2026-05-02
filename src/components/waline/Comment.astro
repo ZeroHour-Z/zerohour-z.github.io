@@ -26,12 +26,14 @@ const { class: className } = Astro.props
   const walineConfig = config.integ.waline
 
   class Comment extends HTMLElement {
+    private waline?: { destroy?: () => void }
+
     constructor() {
       super()
     }
 
     connectedCallback() {
-      // Prevent Vue log errors
+      if (this.waline) return // Prevent Vue log errors
       ;(globalThis as unknown as { __VUE_OPTIONS_API__: boolean }).__VUE_OPTIONS_API__ = true
       ;(globalThis as unknown as { __VUE_PROD_DEVTOOLS__: boolean }).__VUE_PROD_DEVTOOLS__ = false
       ;(
@@ -42,17 +44,24 @@ const { class: className } = Astro.props
         (preset) => `${config.npmCDN}/@waline/emojis@1.2.0/${preset}` as WalineEmojiPresets
       )
 
-      walineInit({
+      this.waline = walineInit({
         el: '#waline',
         serverURL: walineConfig.server || '',
         emoji,
         reaction: ['/icons/heart-item.svg'],
         ...walineConfig.additionalConfigs
-      })
+      }) as { destroy?: () => void }
+    }
+
+    disconnectedCallback() {
+      this.waline?.destroy?.()
+      this.waline = undefined
     }
   }
 
-  if (walineConfig.enable) customElements.define('comment-component', Comment)
+  if (walineConfig.enable && !customElements.get('comment-component')) {
+    customElements.define('comment-component', Comment)
+  }
 </script>
 
 <style>
@@ -95,16 +104,68 @@ const { class: className } = Astro.props
   }
 
   /* Fix long text and links overflow */
-  #waline :global(.wl-content, .wl-text, .wl-comment-text, .wl-item, .wl-card-item, a) {
+  #waline :global(.wl-content, .wl-text, .wl-comment-text, .wl-item, .wl-card-item) {
     max-width: 100%;
   }
-  #waline :global(.wl-meta, .wl-content, .wl-text, .wl-comment-text) {
+  #waline :global(.wl-content, .wl-text, .wl-comment-text) {
     word-wrap: break-word;
     word-break: break-word;
     overflow-wrap: anywhere;
   }
-  #waline :global(a) {
-    display: inline-block;
+  #waline :global(.wl-content a, .wl-text a, .wl-comment-text a) {
+    display: inline;
+    overflow-wrap: anywhere;
+  }
+  #waline :global(.wl-meta-foot) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    width: 100%;
+    min-width: 0;
+    line-height: 1.5;
+    word-break: normal;
+    overflow-wrap: normal;
+    white-space: normal;
+  }
+  #waline :global(.wl-meta-foot .wl-rss) {
+    display: flex;
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 0.75rem;
+    min-width: min(100%, 18rem);
+    max-width: 100%;
+  }
+  #waline :global(.wl-meta-foot .wl-power) {
+    flex: 0 0 auto;
+    margin-inline-start: auto;
+    white-space: nowrap;
+  }
+  #waline :global(.wl-meta-foot .wl-rss a) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    width: auto;
+    max-width: 100%;
+    white-space: nowrap;
+    word-break: keep-all;
+    overflow-wrap: normal;
+  }
+  #waline :global(.wl-meta-foot .wl-rss span) {
+    display: inline;
+    white-space: nowrap;
+    word-break: keep-all;
+  }
+  @media (max-width: 640px) {
+    #waline :global(.wl-meta-foot) {
+      align-items: flex-start;
+      justify-content: flex-start;
+    }
+    #waline :global(.wl-meta-foot .wl-power) {
+      margin-inline-start: 0;
+    }
   }
   #waline :global(.wl-item, .wl-card-item) {
     overflow: hidden;

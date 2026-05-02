@@ -27,7 +27,7 @@ const allPostsByDate = sortMDByDate(allPosts).slice(0, MAX_POSTS)
       <Image
         src={avatar}
         alt='profile'
-        class='h-28 w-auto rounded-full border p-1'
+        class='home-avatar h-28 w-auto rounded-full border p-1'
         loading='eager'
       />
 
@@ -37,12 +37,7 @@ const allPostsByDate = sortMDByDate(allPosts).slice(0, MAX_POSTS)
           <Label title='China'>
             <Icon name='location' class='size-5' slot='icon' />
           </Label>
-          <Label
-            title='GitHub'
-            as='a'
-            href='https://github.com/ZeroHour-Z'
-            target='_blank'
-          >
+          <Label title='GitHub' as='a' href='https://github.com/ZeroHour-Z' target='_blank'>
             <Icon name='github' class='size-5' slot='icon' />
           </Label>
           <Label
@@ -61,23 +56,12 @@ const allPostsByDate = sortMDByDate(allPosts).slice(0, MAX_POSTS)
           >
             <Icon name='bilibili' class='size-5' slot='icon' />
           </Label>
-          <Label
-            title='X'
-            as='a'
-            href='https://x.com/ZeroHour0S'
-            target='_blank'
-          >
+          <Label title='X' as='a' href='https://x.com/ZeroHour0S' target='_blank'>
             <Icon name='x' class='size-5' slot='icon' />
           </Label>
-          <Label
-            title='Mail'
-            as='a'
-            href='mailto:2719850558@qq.com'
-            target='_blank'
-          >
+          <Label title='Mail' as='a' href='mailto:2719850558@qq.com' target='_blank'>
             <Icon name='email' class='size-5' slot='icon' />
           </Label>
-          
         </div>
       </div>
 
@@ -103,19 +87,32 @@ const allPostsByDate = sortMDByDate(allPosts).slice(0, MAX_POSTS)
         <p class='text-muted-foreground'>
           XJTU' 23 自动化，热爱音乐制作，人工智能，机器人，视觉设计，交互设计。
         </p>
-        <Button title='More about me' class='w-fit self-end' href='/about' variant='ahead' />
+        <Button
+          title='More about me'
+          class='glass-button w-fit self-end'
+          href='/about'
+          variant='ahead'
+        />
       </Section>
       {
         allPostsByDate.length > 0 && (
           <Section title='Posts'>
             <ul class='flex flex-col gap-y-1.5 sm:gap-y-2'>
               {allPostsByDate.map((p, i) => (
-                <li class='scroll-reveal post-preview-item flex flex-col gap-x-2 sm:flex-row' style={`transition-delay: ${i * 50}ms`}>
+                <li
+                  class='scroll-reveal post-preview-item flex flex-col gap-x-2 sm:flex-row'
+                  style={`transition-delay: ${i * 50}ms`}
+                >
                   <PostPreview post={p} />
                 </li>
               ))}
             </ul>
-            <Button title='More posts' class='w-fit self-end' href='/blog' variant='ahead' />
+            <Button
+              title='More posts'
+              class='glass-button w-fit self-end'
+              href='/blog'
+              variant='ahead'
+            />
           </Section>
         )
       }
@@ -178,7 +175,7 @@ const allPostsByDate = sortMDByDate(allPosts).slice(0, MAX_POSTS)
           />
         </div>
       </Section>
-      
+
       <Section title='Education'>
         <Card
           as='a'

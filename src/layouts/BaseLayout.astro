@@ -27,10 +27,14 @@ const {
     <ThemeProvider />
   </head>
 
-  <body class='flex justify-center text-foreground' style='background: transparent; isolation: isolate;' {...props}>
+  <body
+    class='flex justify-center text-foreground'
+    style='background: transparent; isolation: isolate;'
+    {...props}
+  >
     {/* 全局背景动画 */}
-    <BackgroundDecorator type="animated" transition:persist />
-    
+    <BackgroundDecorator type='animated' transition:persist />
+
     {
       highlightColor && (
         <div
@@ -40,31 +44,44 @@ const {
         />
       )
     }
-    <div class='w-full max-w-[70rem] px-4 sm:px-7 lg:px-10 min-h-[100dvh] flex flex-col justify-between' style='position: relative; z-index: 1;'>
-      <Header transition:name="header" transition:animate="none" />
+    <div
+      class='w-full max-w-[70rem] px-4 sm:px-7 lg:px-10 min-h-[100dvh] flex flex-col justify-between'
+      style='position: relative; z-index: 1;'
+    >
+      <Header transition:name='header' transition:animate='none' />
       <div class='flex-1 w-full'>
         <slot />
       </div>
-      <Footer transition:name="footer" transition:animate="none" />
+      <Footer transition:name='footer' transition:animate='none' />
     </div>
 
     {/* Scroll reveal observer */}
     <script>
-      function initScrollReveal() {
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('visible')
-              observer.unobserve(entry.target)
-            }
-          })
-        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' })
+      const zeroHourLayoutState = globalThis as typeof globalThis & {
+        __zeroHourScrollRevealBound?: boolean
+      }
 
-        document.querySelectorAll('.scroll-reveal').forEach(el => observer.observe(el))
+      function initScrollReveal() {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('visible')
+                observer.unobserve(entry.target)
+              }
+            })
+          },
+          { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+        )
+
+        document.querySelectorAll('.scroll-reveal').forEach((el) => observer.observe(el))
       }
 
       initScrollReveal()
-      document.addEventListener('astro:after-swap', initScrollReveal)
+      if (!zeroHourLayoutState.__zeroHourScrollRevealBound) {
+        document.addEventListener('astro:after-swap', initScrollReveal)
+        zeroHourLayoutState.__zeroHourScrollRevealBound = true
+      }
     </script>
 
     {/* Set highlight color */}

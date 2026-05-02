@@ -9,6 +9,8 @@ import config from '@/site-config'
   data-astro-rerun
   define:vars={{ npmCDN: config.npmCDN, walineServer: config.integ.waline.server }}
 >
+  const pageviewState = globalThis
+
   async function loadPageview() {
     try {
       const pageview = await import(`${npmCDN}/@waline/client@v3/dist/pageview.js`)
@@ -24,7 +26,16 @@ import config from '@/site-config'
     }
   }
 
-  const abort = await loadPageview()
-  // After 500ms, if the network request has not been completed, cancel this operation
-  setTimeout(() => abort(), 500)
+  function schedulePageview() {
+    if (pageviewState.__zeroHourPageviewPath === window.location.pathname) return
+    pageviewState.__zeroHourPageviewPath = window.location.pathname
+
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(loadPageview, { timeout: 1500 })
+    } else {
+      setTimeout(loadPageview, 0)
+    }
+  }
+
+  schedulePageview()
 </script>
