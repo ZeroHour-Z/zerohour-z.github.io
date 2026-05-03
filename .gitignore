@@ -68,6 +68,7 @@ pnpm-debug.log*
 
 # dependencies
 node_modules/
+.pnpm-store/
 
 # environment variables
 .env
