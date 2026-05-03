@@ -34,6 +34,8 @@ const { class: className } = Astro.props
 
     connectedCallback() {
       if (this.waline) return // Prevent Vue log errors
+      const el = this.querySelector('#waline') as HTMLElement | null
+      if (!el) return
       ;(globalThis as unknown as { __VUE_OPTIONS_API__: boolean }).__VUE_OPTIONS_API__ = true
       ;(globalThis as unknown as { __VUE_PROD_DEVTOOLS__: boolean }).__VUE_PROD_DEVTOOLS__ = false
       ;(
@@ -44,13 +46,18 @@ const { class: className } = Astro.props
         (preset) => `${config.npmCDN}/@waline/emojis@1.2.0/${preset}` as WalineEmojiPresets
       )
 
-      this.waline = walineInit({
-        el: '#waline',
-        serverURL: walineConfig.server || '',
-        emoji,
-        reaction: ['/icons/heart-item.svg'],
-        ...walineConfig.additionalConfigs
-      }) as { destroy?: () => void }
+      try {
+        this.waline = walineInit({
+          el,
+          serverURL: walineConfig.server || '',
+          emoji,
+          reaction: ['/icons/heart-item.svg'],
+          ...walineConfig.additionalConfigs
+        }) as { destroy?: () => void }
+      } catch (error) {
+        console.error('Failed to initialize Waline comment:', error)
+        el.textContent = 'Comment failed to load. Please refresh later.'
+      }
     }
 
     disconnectedCallback() {

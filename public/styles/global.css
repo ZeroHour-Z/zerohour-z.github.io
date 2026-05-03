@@ -476,6 +476,47 @@ button.group.inline-flex.border.bg-muted svg {
   border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
+/* Safari repaints large filters/backdrop layers aggressively during navigation. */
+.safari header-component.not-top,
+.safari header-component #toggleDarkMode,
+.safari .home-avatar,
+.safari .glass-button,
+.safari .glass-pill,
+.safari a.group.inline-flex.border.bg-muted,
+.safari button.group.inline-flex.border.bg-muted,
+.safari .post-preview,
+.safari .card-interactive,
+.safari .not-prose.rounded-2xl.border.bg-muted,
+.safari .not-prose.rounded-xl.border.bg-muted {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.safari .glass-button,
+.safari .glass-pill,
+.safari a.group.inline-flex.border.bg-muted,
+.safari button.group.inline-flex.border.bg-muted,
+.safari .post-preview,
+.safari .card-interactive,
+.safari .not-prose.rounded-2xl.border.bg-muted,
+.safari .not-prose.rounded-xl.border.bg-muted {
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease !important;
+}
+.safari .glass-button:hover,
+.safari .glass-pill:hover,
+.safari a.group.inline-flex.border.bg-muted:hover,
+.safari button.group.inline-flex.border.bg-muted:hover,
+.safari .post-preview:hover,
+.safari .card-interactive:hover,
+.safari .not-prose.rounded-2xl.border.bg-muted:hover,
+.safari .not-prose.rounded-xl.border.bg-muted:hover,
+.safari [data-post-preview]:hover,
+.safari .post-preview-item:hover {
+  transform: none !important;
+}
+
 /* PostPreview hover shift */
 [data-post-preview],
 .post-preview-item {

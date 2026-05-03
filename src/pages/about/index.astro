@@ -7,34 +7,51 @@ import ToolSection from '@/components/about/ToolSection.astro'
 const headings = [
   { depth: 2, slug: 'hobbies', text: 'Hobbies' },
   { depth: 2, slug: 'tools', text: 'Tools' },
-  { depth: 2, slug: 'social-networks', text: 'Social Networks' },
+  { depth: 2, slug: 'social-networks', text: 'Social Networks' }
 ]
 ---
 
 <PageLayout title='About' {headings} comment>
-  <p>Developer / Designer / Music Producer / DJ</p>
-  <p>
-    XJTU' 23 自动化
-  </p>
+  <p>Developer / Music Producer / DJ</p>
+  <p>XJTU' 23 Automation</p>
+  <ul>
+  <li>非典型 INFP，四个字母全在 50%～60%</li>
+  <li>多风格作编曲混音母带音乐一体机，XJTU 原创音乐社社长，擅长电子 / 流行 / 管弦编曲，专精电子，作品发过 SoulNotes / Phono / Chillme / Citysounds 等国内各大厂牌，给游戏供曲，可以找我帮忙写歌😎</li>
+  <li>整点机器人，某机器人社团视觉组组长，机器人视觉和导航，球球了再拿一次国一吧😭</li>
+  <li>瞎搞人工智能，纯新手，数据挖掘，推荐系统，大模型啥的完全搞不懂，想学会又什么都学不会😵‍💫</li>
+  <li>乱造视觉设计，blender 什么效果什么操作往上怼，造出什么东西纯靠运气🤡</li>
+  </ul>
   <p>
     <Spoiler>この世界は騒がし過ぎるから，聞かないで，見ないで，構わないで，そして前に進め</Spoiler>
   </p>
-  <Button title='Sponsor Me' class='w-fit' href='/projects#sponsorship' variant='ahead' />
+  <div class='not-prose flex flex-wrap gap-3'>
+    <Button
+      title='Sponsor Me'
+      class='glass-button w-fit'
+      href='/projects#sponsorship'
+      variant='ahead'
+    />
+    <Button
+      title='My CV'
+      class='glass-button w-fit'
+      href='/cv_zh.pdf'
+      target='_blank'
+      variant='ahead'
+    />
+  </div>
 
   {/* general-talk */}
   <h2 id='hobbies'>Hobbies</h2>
   <ul>
-    <li>Music Production</li>
-    <li>Web Development</li>
-    <li>DJ</li>
-    <li>Computer Science</li>
-    <li>AI</li>
-    <li>Sound Design</li>
+    <li>Coding</li>
+    <li>Large Language Models</li>
+    <li>Data Mining / Recommendation Systems</li>
+    <li>Robotics / Computer Vision / Navigation</li>
+    <li>Music Production / Sound Design</li>
   </ul>
 
   {/* tools */}
   <h2 id='tools'>Tools</h2>
-  <p>Current support tools as follow:</p>
   <ToolSection
     class='mb-5'
     title='Tools'
@@ -86,7 +103,7 @@ const headings = [
         description: '3D Modeling',
         href: 'https://www.blender.org/',
         icon: import('@/assets/tools/blender.svg?raw')
-      },
+      }
     ]}
   />
   <ToolSection
@@ -110,9 +127,7 @@ const headings = [
 
   {/* social-networks */}
   <h2 id='social-networks'>Social Networks</h2>
-  <p>
-    
-  </p>
+  <p></p>
   <Substats
     stats={[
       {

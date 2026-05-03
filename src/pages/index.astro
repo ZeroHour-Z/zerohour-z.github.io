@@ -8,13 +8,8 @@ import { Button, Card, Icon, Label } from 'astro-pure/user'
 import PageLayout from '@/layouts/BaseLayout.astro'
 import ProjectCard from '@/components/home/ProjectCard.astro'
 import Section from '@/components/home/Section.astro'
-import SkillLayout from '@/components/home/SkillLayout.astro'
 import avatar from '@/assets/github.jpg'
 import config from '@/site-config'
-
-const languages = ['Python', 'C++', 'C', 'CSS', 'JavaScript', 'Shell']
-const frontend = ['Astro', 'Vue', 'TailwindCSS']
-const backend = ['Vercel', 'Git', 'Linux']
 
 const MAX_POSTS = 10
 const allPosts = await getBlogCollection()
@@ -83,9 +78,9 @@ const allPostsByDate = sortMDByDate(allPosts).slice(0, MAX_POSTS)
 
     <div id='content' class='animate flex flex-col gap-y-10 md:w-4/5 lg:w-5/6'>
       <Section title='About'>
-        <p class='text-muted-foreground'>Developer / Designer / Music Producer / DJ</p>
+        <p class='text-muted-foreground'>Developer / Music Producer / DJ</p>
         <p class='text-muted-foreground'>
-          XJTU' 23 自动化，热爱音乐制作，人工智能，机器人，视觉设计，交互设计。
+          XJTU' 23 自动化，喜欢做音乐，人工智能，机器人，视觉设计。
         </p>
         <Button
           title='More about me'
@@ -206,12 +201,6 @@ const allPostsByDate = sortMDByDate(allPosts).slice(0, MAX_POSTS)
           href='https://www.youtube.com/watch?v=dQw4w9WgXcQ'
         />
       </Section> -->
-
-      <Section title='Skills'>
-        <SkillLayout title='Languages' skills={languages} />
-        <SkillLayout title='Frontend' skills={frontend} />
-        <SkillLayout title='Backend' skills={backend} />
-      </Section>
     </div>
     <Quote class='mt-12' />
   </main>

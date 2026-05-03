@@ -54,8 +54,8 @@ export default defineConfig({
   ],
   // root: './my-project-directory',
 
-  // Prefetch Options
-  prefetch: true,
+  // Prefetching many generated blog/tag links can overwhelm the dev server and make navigation feel stuck.
+  prefetch: false,
   // Server Options
   server: {
     host: true

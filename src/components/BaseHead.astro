@@ -1,6 +1,4 @@
 ---
-import { ClientRouter } from 'astro:transitions'
-
 import { prod } from 'astro-pure/server'
 import type { SiteMeta } from 'astro-pure/types'
 import config from '@/site-config'
@@ -151,27 +149,15 @@ const rssURL = new URL('/rss.xml', Astro.site).href
 }
 
 {/* Styles */}
-<link rel='stylesheet' href='/styles/global.css' />
-
-{/* View transitions */}
-<ClientRouter />
 <script is:inline>
-  const zeroHourHeadState = globalThis
+  const ua = navigator.userAgent
+  const isSafari = /Safari/.test(ua) && !/Chrome|Chromium|CriOS|FxiOS|Edg|OPR|Android/.test(ua)
 
-  function temporarilyDisableTransitions() {
-    const style = document.createElement('style')
-    style.textContent = `* { transition: none !important; }`
-    document.head.appendChild(style)
-    setTimeout(() => {
-      style.remove()
-    }, 100)
-  }
-
-  if (!zeroHourHeadState.__zeroHourDisableTransitionBound) {
-    document.addEventListener('astro:after-swap', temporarilyDisableTransitions)
-    zeroHourHeadState.__zeroHourDisableTransitionBound = true
+  if (isSafari) {
+    document.documentElement.classList.add('safari')
   }
 </script>
+<link rel='stylesheet' href='/styles/global.css' />
 
 {
   /* User script*/
