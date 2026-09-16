@@ -1,12 +1,17 @@
 ---
 title: "导航补充教程"
-publishDate: 2026-09-016
-description: "一份导航教程附录"
+publishDate: 2026-09-16
+description: "机器人导航进阶：图搜索、轨迹优化、地图表示与动态避障"
 tags:
   - daily
+  - navigation
+  - robotics
+  - robomaster
 ---
 
 ## 导航培训 Appendix：规划、地图与动态避障进阶
+
+> 本文是[导航教程](/blog/daily/2609/%E5%AF%BC%E8%88%AA)的进阶附录，建议先了解重定位、里程计、全局规划器和局部规划器的基本分工。
 
 ### 零.
 
