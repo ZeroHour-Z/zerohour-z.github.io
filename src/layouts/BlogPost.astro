@@ -43,6 +43,14 @@ const socialImage = heroImage
     : heroImage.src.src
   : '/images/social-card.png'
 const articleDate = updatedDate?.toISOString() ?? publishDate.toISOString()
+
+// The theme's TOC expects body headings to start at h2 and throws on a post whose
+// first heading is h3 or deeper. Shift depths so the shallowest body heading is h2.
+const bodyHeadings = headings.filter(({ depth }) => depth > 1)
+const depthShift = bodyHeadings.length
+  ? Math.min(...bodyHeadings.map(({ depth }) => depth)) - 2
+  : 0
+const tocHeadings = bodyHeadings.map((h) => ({ ...h, depth: h.depth - depthShift }))
 const primaryColor = data.heroImage?.color ?? 'hsl(var(--primary) / var(--un-text-opacity))'
 ---
 
@@ -51,7 +59,7 @@ const primaryColor = data.heroImage?.color ?? 'hsl(var(--primary) / var(--un-tex
   highlightColor={primaryColor}
   {back}
 >
-  {!!headings.length && <TOC {headings} slot='sidebar' />}
+  {!!tocHeadings.length && <TOC headings={tocHeadings} slot='sidebar' />}
 
   <Hero {data} {remarkPluginFrontmatter} slot='header'>
     <Fragment slot='description'>
