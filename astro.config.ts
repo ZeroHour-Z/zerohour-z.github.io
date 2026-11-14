@@ -101,6 +101,12 @@ export default defineConfig({
       //     filename: 'stats.html'
       //   })
     ],
+    // Pre-bundle client deps up front. Discovering them on first page load makes Vite
+    // re-optimize mid-session ("504 Outdated Optimize Dep") and the dev server hangs,
+    // which left the Waline comment box stuck on its placeholder text.
+    optimizeDeps: {
+      include: ['@waline/client']
+    },
     server: {
       watch: {
         ignored: ['**/.astro/**', '**/.vercel/**', '**/dist/**', '**/node_modules/**'],
