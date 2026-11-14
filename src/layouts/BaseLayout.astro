@@ -1,6 +1,8 @@
 ---
-import { Footer, Header, ThemeProvider } from 'astro-pure/components/basic'
+import { ThemeProvider } from 'astro-pure/components/basic'
 import type { SiteMeta } from 'astro-pure/types'
+import Footer from '@/components/basic/Footer.astro'
+import Header from '@/components/basic/Header.astro'
 import BaseHead from '@/components/BaseHead.astro'
 import BackgroundDecorator from '@/components/home/BackgroundDecorator.astro'
 import config from '@/site-config'
@@ -12,11 +14,14 @@ import '@/assets/styles/app.css'
 interface Props {
   meta: SiteMeta
   highlightColor?: string
+  /** Skip the centered content container so the page can use full-bleed sections. */
+  wide?: boolean
 }
 
 const {
   meta: { articleDate, description = config.description, ogImage, title },
   highlightColor,
+  wide = false,
   ...props
 } = Astro.props
 ---
@@ -28,23 +33,24 @@ const {
   </head>
 
   <body
-    class='flex justify-center text-foreground'
+    class='flex min-h-[100dvh] flex-col text-foreground'
     style='background: transparent; isolation: isolate;'
     {...props}
   >
-    {/* 全局背景动画 */}
+    {/* 全局背景 */}
     <BackgroundDecorator type='none' transition:persist />
 
+    <Header transition:name='header' transition:animate='none' />
     <div
-      class='w-full max-w-[70rem] px-4 sm:px-7 lg:px-10 min-h-[100dvh] flex flex-col justify-between'
+      class:list={[
+        'w-full flex-1',
+        !wide && 'mx-auto max-w-[70rem] px-4 pt-10 sm:px-7 lg:px-10'
+      ]}
       style='position: relative; z-index: 1;'
     >
-      <Header transition:name='header' transition:animate='none' />
-      <div class='flex-1 w-full'>
-        <slot />
-      </div>
-      <Footer transition:name='footer' transition:animate='none' />
+      <slot />
     </div>
+    <Footer transition:name='footer' transition:animate='none' />
 
     {/* Scroll reveal observer */}
     <script>
