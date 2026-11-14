@@ -5,6 +5,7 @@ import { getBlogCollection, sortMDByDate } from 'astro-pure/server'
 import { getFormattedDate } from 'astro-pure/utils'
 import PageLayout from '@/layouts/BaseLayout.astro'
 import ProjectCard from '@/components/home/ProjectCard.astro'
+import SocialIcon from '@/components/SocialIcon.astro'
 import avatar from '@/assets/github.jpg'
 import config from '@/site-config'
 import { isRegularBlogPost } from '@/utils/course-notes'
@@ -14,37 +15,43 @@ const allPosts = await getBlogCollection()
 const posts = sortMDByDate(allPosts).filter(isRegularBlogPost).slice(0, MAX_POSTS)
 
 const socials = [
-  { label: 'GitHub', href: 'https://github.com/ZeroHour-Z' },
-  { label: 'Netease', href: 'https://music.163.com/artist?id=33400424' },
-  { label: 'Bilibili', href: 'https://space.bilibili.com/499513500' },
-  { label: 'X', href: 'https://x.com/ZeroHour0S' },
-  { label: 'Mail', href: 'mailto:2719850558@qq.com' }
+  { label: 'GitHub', icon: 'github', href: 'https://github.com/ZeroHour-Z' },
+  { label: 'Netease', icon: 'netease', href: 'https://music.163.com/artist?id=33400424' },
+  {
+    label: 'Spotify',
+    icon: 'spotify',
+    href: 'https://open.spotify.com/artist/2JIwOlRMVaRlmEFDd6sQH0'
+  },
+  { label: 'Bilibili', icon: 'bilibili', href: 'https://space.bilibili.com/499513500' },
+  { label: 'X', icon: 'x', href: 'https://x.com/ZeroHour0S' },
+  { label: 'Mail', icon: 'email', href: 'mailto:2719850558@qq.com' }
 ]
 
+// Latest releases on Netease Cloud Music (artist 33400424)
 const music = [
   {
-    href: 'https://music.163.com/song?id=2734339346&uct2=U2FsdGVkX19JAG2WI6YlXKFJIvwkf/dQbmOwOVlO7/c=',
+    href: 'https://music.163.com/song?id=2734339346',
     heading: 'Watercooler talk',
-    subheading: '2025-08-08',
+    subheading: 'Single · 2025-08-08',
     imagePath: '/src/assets/projects/Watercooler talk.jpg'
   },
   {
-    href: 'https://music.163.com/song?id=2692276840&uct2=U2FsdGVkX1+XK8zh1/7CYp0ThuNHQ0RNv8MwLJNM2Qg=',
+    href: 'https://music.163.com/song?id=2711243097',
+    heading: 'Morning',
+    subheading: '源乐之辉 · 2025-06-02',
+    imagePath: '/src/assets/projects/Morning.jpg'
+  },
+  {
+    href: 'https://music.163.com/song?id=2692276840',
     heading: 'Fantasy',
-    subheading: '2025-04-05',
+    subheading: '春の季語 · 2025-04-05',
     imagePath: '/src/assets/projects/Fantasy.jpg'
   },
   {
-    href: 'https://music.163.com/song?id=2673772250&uct2=U2FsdGVkX194i/demJYZwHiMneSKwiqr4HzlbrClhsk=',
-    heading: 'Wistfulness',
-    subheading: '2025-02-11',
-    imagePath: '/src/assets/projects/Wistfulness.jpg'
-  },
-  {
-    href: '/projects',
-    heading: 'More projects',
-    subheading: 'Check out more projects',
-    imagePath: '/src/assets/projects/Beam.jpg'
+    href: 'https://music.163.com/song?id=2683525071',
+    heading: 'Terapy',
+    subheading: '无机体 · 2025-03-15',
+    imagePath: '/src/assets/projects/Terapy.jpg'
   }
 ]
 ---
@@ -62,7 +69,8 @@ const music = [
         {
           socials.map((s) => (
             <li>
-              <a class='ul-link' href={s.href} target='_blank'>
+              <a class='ul-link inline-flex items-center gap-x-1.5' href={s.href} target='_blank'>
+                <SocialIcon name={s.icon} class='size-[1.1em]' />
                 {s.label}
               </a>
             </li>
@@ -116,9 +124,24 @@ const music = [
       <div class='wrap py-16 sm:py-24'>
         <div class='flex items-end justify-between gap-x-4'>
           <h2 class='section-title'>Music</h2>
-          <a class='arrow-link' href='https://music.163.com/artist?id=33400424' target='_blank'>
-            Netease →
-          </a>
+          <div class='flex flex-wrap justify-end gap-x-5 gap-y-2'>
+            <a
+              class='arrow-link inline-flex items-center gap-x-1.5'
+              href='https://music.163.com/artist?id=33400424'
+              target='_blank'
+            >
+              <SocialIcon name='netease' class='size-[1.1em]' />
+              Netease →
+            </a>
+            <a
+              class='arrow-link inline-flex items-center gap-x-1.5'
+              href='https://open.spotify.com/artist/2JIwOlRMVaRlmEFDd6sQH0'
+              target='_blank'
+            >
+              <SocialIcon name='spotify' class='size-[1.1em]' />
+              Spotify →
+            </a>
+          </div>
         </div>
         <div class='mt-10 grid grid-cols-2 gap-3 lg:grid-cols-4'>
           {music.map((m) => <ProjectCard {...m} />)}

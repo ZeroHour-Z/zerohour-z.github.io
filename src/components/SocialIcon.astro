@@ -1,0 +1,21 @@
+---
+// Social icon: theme icons for the built-in platforms, local SVG for Spotify.
+import type { iconsType } from 'astro-pure/types'
+import { Icon } from 'astro-pure/user'
+import spotifySvg from '@/assets/icons/spotify.svg?raw'
+
+interface Props {
+  name: string
+  class?: string
+}
+
+const { name, class: className = 'size-5' } = Astro.props
+---
+
+{
+  name === 'spotify' ? (
+    <span class:list={['inline-flex shrink-0', className]} set:html={spotifySvg} />
+  ) : (
+    <Icon name={name as iconsType} class={className} />
+  )
+}

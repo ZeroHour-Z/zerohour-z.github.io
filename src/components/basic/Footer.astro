@@ -1,5 +1,6 @@
 ---
 // Local replacement for astro-pure's Footer: full-width black block, big type.
+import SocialIcon from '@/components/SocialIcon.astro'
 import config from '@/site-config'
 
 const footerConf = config.footer
@@ -12,9 +13,16 @@ const labels: Record<string, string> = {
 }
 const social = Object.entries(footerConf.social ?? {}).map(([key, value]) => {
   const url = typeof value === 'string' ? value : (value as { url: string }).url
-  return { label: labels[key] ?? key, url }
+  return { icon: key, label: labels[key] ?? key, url }
 })
-social.push({ label: 'RSS', url: '/rss.xml' })
+// Spotify is not in the theme's social schema, so it is added here
+const neteaseIndex = social.findIndex(({ icon }) => icon === 'netease')
+social.splice(neteaseIndex + 1, 0, {
+  icon: 'spotify',
+  label: 'Spotify',
+  url: 'https://open.spotify.com/artist/2JIwOlRMVaRlmEFDd6sQH0'
+})
+social.push({ icon: 'rss', label: 'RSS', url: '/rss.xml' })
 
 const links = footerConf.links ?? []
 const infoLinks = links.filter(({ pos }) => pos !== 2)
@@ -42,9 +50,14 @@ const policyLinks = links.filter(({ pos }) => pos === 2)
         <p class='footer-label'>Elsewhere</p>
         <ul class='footer-list'>
           {
-            social.map(({ label, url }) => (
+            social.map(({ icon, label, url }) => (
               <li>
-                <a href={url} target={url.startsWith('/') ? undefined : '_blank'}>
+                <a
+                  class='inline-flex items-center gap-x-2'
+                  href={url}
+                  target={url.startsWith('/') ? undefined : '_blank'}
+                >
+                  <SocialIcon name={icon} class='size-4' />
                   {label}
                 </a>
               </li>
