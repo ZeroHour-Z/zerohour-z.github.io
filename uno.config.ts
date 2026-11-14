@@ -11,14 +11,26 @@ const bgMuted = 'hsl(var(--muted) / var(--un-bg-opacity, 1))'
 const typographyConfig = {
   cssExtend: {
     // Title
-    'h2,h3,h4,h5,h6': {
+    'h1,h2,h3,h4,h5,h6': {
       'scroll-margin-top': '3rem',
-      'font-weight': '500',
+      'font-family': 'var(--font-display)',
+      'font-weight': '700',
+      'letter-spacing': '-0.02em',
+      'line-height': '1.15',
       color: fg
+    },
+    h2: {
+      'font-size': '1.875em',
+      'padding-top': '0.6em',
+      'border-top': '3px solid ' + fg
+    },
+    h3: {
+      'font-size': '1.375em'
     },
     'h1>a,h2>a,h3>a,h4>a,h5>a,h6>a': {
       'margin-inline-start': '0.75rem',
       color: fgMuted,
+      'text-decoration': 'none',
       transition: 'opacity 0.2s ease',
       opacity: '0'
     },
@@ -31,28 +43,14 @@ const typographyConfig = {
     'h1:target>a,h2:target>a,h3:target>a,h4:target>a,h5:target>a,h6:target>a': {
       opacity: 1
     },
-    // Blockquote
+    // Blockquote: flat block with a thick accent bar
     blockquote: {
-      position: 'relative',
-      overflow: 'hidden',
-      'border-width': '1px',
-      'border-left': 'inherit',
-      'border-radius': 'var(--radius)',
-      'padding-inline': '1.6rem',
-      'box-shadow': '0 5px 0 ' + bgMuted,
+      'border-left': '6px solid hsl(var(--block-orange) / 1)',
+      'background-color': bgMuted,
+      'padding-block': '0.25em',
+      'padding-inline': '1.25em',
+      color: fg,
       ...(typographyCustom.blockquoteStyle === 'normal' && { 'font-style': 'normal' })
-    },
-    'blockquote::after': {
-      color: fgMuted,
-      position: 'absolute',
-      content: '"”"',
-      top: '2.6rem',
-      right: '-1.4rem',
-      'font-size': '10rem',
-      'font-family':
-        '"Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif',
-      transform: 'rotate(-15deg)',
-      opacity: '0.1'
     },
     // Table
     table: {
@@ -65,8 +63,11 @@ const typographyConfig = {
     'tbody tr:last-child': {
       'border-bottom-width': '0'
     },
+    thead: {
+      'border-bottom': '2px solid ' + fg
+    },
     'thead th': {
-      'font-weight': '500',
+      'font-weight': '700',
       color: fg
     },
     'td, th': {
@@ -106,7 +107,7 @@ const typographyConfig = {
     }),
     // Others
     img: {
-      'border-radius': 'var(--radius)',
+      'border-radius': '0',
       margin: '0 auto'
     },
     hr: {
@@ -119,7 +120,7 @@ const typographyConfig = {
         '0 0 0 1px hsl(var(--primary-foreground) / 1), 0 3px hsl(var(--primary-foreground) / 1)'
     },
     strong: {
-      'font-weight': '600',
+      'font-weight': '700',
       color: fg
     },
     a: {
@@ -127,8 +128,15 @@ const typographyConfig = {
       'word-break': 'break-word',
       'overflow-wrap': 'anywhere',
       'font-weight': '500',
+      color: 'hsl(var(--primary) / 1)',
+      'text-decoration': 'underline',
+      'text-decoration-thickness': '2px',
+      'text-underline-offset': '3px'
+    },
+    'a:hover': {
       color: fg
     },
+
     'code:not(pre code)': {
       'white-space': 'pre-wrap!important',
       'word-break': 'break-all!important'
@@ -209,7 +217,19 @@ export default defineConfig({
   ],
   rules,
   theme: {
-    colors: themeColors
+    colors: themeColors,
+    // Flat, square-cornered look. Keep `full` so circles (avatar, dots) stay round.
+    borderRadius: {
+      DEFAULT: '0',
+      none: '0',
+      sm: '0',
+      md: '0',
+      lg: '0',
+      xl: '0',
+      '2xl': '0',
+      '3xl': '0',
+      full: '9999px'
+    }
   },
   // https://unocss.dev/guide/extracting#limitations
   safelist: [

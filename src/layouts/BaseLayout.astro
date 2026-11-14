@@ -33,17 +33,8 @@ const {
     {...props}
   >
     {/* 全局背景动画 */}
-    <BackgroundDecorator type='animated' transition:persist />
+    <BackgroundDecorator type='none' transition:persist />
 
-    {
-      highlightColor && (
-        <div
-          id='highlight-gradient'
-          class='pointer-events-none absolute start-0 top-0 z-0 h-screen w-full opacity-25'
-          style={`background-image:linear-gradient(${highlightColor},transparent)`}
-        />
-      )
-    }
     <div
       class='w-full max-w-[70rem] px-4 sm:px-7 lg:px-10 min-h-[100dvh] flex flex-col justify-between'
       style='position: relative; z-index: 1;'
