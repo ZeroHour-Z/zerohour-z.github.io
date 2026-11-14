@@ -8,6 +8,7 @@ import { Button, Card, Icon, Label } from 'astro-pure/user'
 import PageLayout from '@/layouts/BaseLayout.astro'
 import ProjectCard from '@/components/home/ProjectCard.astro'
 import Section from '@/components/home/Section.astro'
+import SocialIcon from '@/components/SocialIcon.astro'
 import avatar from '@/assets/github.jpg'
 import config from '@/site-config'
 import { isRegularBlogPost } from '@/utils/course-notes'
@@ -43,6 +44,14 @@ const allPostsByDate = sortMDByDate(allPosts).filter(isRegularBlogPost).slice(0,
             target='_blank'
           >
             <Icon name='netease' class='size-5' slot='icon' />
+          </Label>
+          <Label
+            title='Spotify'
+            as='a'
+            href='https://open.spotify.com/artist/2JIwOlRMVaRlmEFDd6sQH0'
+            target='_blank'
+          >
+            <SocialIcon name='spotify' class='size-5' slot='icon' />
           </Label>
           <Label
             title='Bilibili'
@@ -156,28 +165,28 @@ const allPostsByDate = sortMDByDate(allPosts).filter(isRegularBlogPost).slice(0,
       <Section title='Music'>
         <div class='grid grid-cols-1 gap-0 sm:grid-cols-1 lg:grid-cols-2'>
           <ProjectCard
-            href='https://music.163.com/song?id=2734339346&uct2=U2FsdGVkX19JAG2WI6YlXKFJIvwkf/dQbmOwOVlO7/c='
+            href='https://music.163.com/song?id=2734339346'
             heading='Watercooler talk'
             subheading='2025-08-08'
             imagePath='/src/assets/projects/Watercooler talk.jpg'
           />
           <ProjectCard
-            href='https://music.163.com/song?id=2692276840&uct2=U2FsdGVkX1+XK8zh1/7CYp0ThuNHQ0RNv8MwLJNM2Qg='
+            href='https://music.163.com/song?id=2711243097'
+            heading='Morning'
+            subheading='2025-06-02'
+            imagePath='/src/assets/projects/Morning.jpg'
+          />
+          <ProjectCard
+            href='https://music.163.com/song?id=2692276840'
             heading='Fantasy'
             subheading='2025-04-05'
             imagePath='/src/assets/projects/Fantasy.jpg'
           />
           <ProjectCard
-            href='https://music.163.com/song?id=2673772250&uct2=U2FsdGVkX194i/demJYZwHiMneSKwiqr4HzlbrClhsk='
-            heading='Wistfulness'
-            subheading='2025-02-11'
-            imagePath='/src/assets/projects/Wistfulness.jpg'
-          />
-          <ProjectCard
-            href='/projects'
-            heading='More projects'
-            subheading='Check out more projects'
-            imagePath='/src/assets/projects/Beam.jpg'
+            href='https://music.163.com/song?id=2683525071'
+            heading='Terapy'
+            subheading='2025-03-15'
+            imagePath='/src/assets/projects/Terapy.jpg'
           />
         </div>
       </Section>
