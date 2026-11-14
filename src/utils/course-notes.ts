@@ -63,6 +63,17 @@ export function getCourseUrl(postOrSlug: PostLike | string) {
   return `/notes/${slug}`
 }
 
+/** Chapter part of a course note id, e.g. `第-1-章-绪论` for `automatic_control_theory/第-1-章-绪论`. */
+export function getChapterSlug(post: PostLike) {
+  // A course's own `index.md` has the bare course id; give it a stable chapter slug
+  return post.id.split('/').slice(1).join('/') || 'overview'
+}
+
+/** Docs-style URL of a course note: `/notes/<course>/<chapter>`. */
+export function getNoteUrl(post: PostLike) {
+  return `/notes/${getCourseSlug(post)}/${getChapterSlug(post)}`
+}
+
 export function getCourseGroups<T extends PostLike>(posts: T[]) {
   return courses
     .map((course) => ({

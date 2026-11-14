@@ -3,18 +3,16 @@ import { render, type CollectionEntry } from 'astro:content'
 
 import { getBlogCollection, sortMDByDate } from 'astro-pure/server'
 import PostLayout from '@/layouts/BlogPost.astro'
-import { getCourseUrl, isCourseNote, isRegularBlogPost } from '@/utils/course-notes'
+import { getNoteUrl, isCourseNote, isRegularBlogPost } from '@/utils/course-notes'
 
 export const prerender = true
 
 export async function getStaticPaths() {
   const posts = sortMDByDate(await getBlogCollection())
+  const regularPosts = posts.filter(isRegularBlogPost)
   return posts.map((post) => ({
     params: { id: post.id },
-    props: {
-      post,
-      posts: posts.filter(isCourseNote(post) ? isCourseNote : isRegularBlogPost)
-    }
+    props: { post, posts: regularPosts }
   }))
 }
 
@@ -24,10 +22,15 @@ type Props = {
 }
 
 const { post, posts } = Astro.props
+
+// Course notes moved to /notes/<course>/<chapter>; keep old /blog/... links working.
+if (isCourseNote(post)) {
+  return Astro.redirect(encodeURI(getNoteUrl(post)), 301)
+}
+
 const { Content, headings, remarkPluginFrontmatter } = await render(post)
-const back = isCourseNote(post) ? getCourseUrl(post) : '/blog'
 ---
 
-<PostLayout {post} {posts} {headings} {remarkPluginFrontmatter} {back}>
+<PostLayout {post} {posts} {headings} {remarkPluginFrontmatter} back='/blog'>
   <Content />
 </PostLayout>

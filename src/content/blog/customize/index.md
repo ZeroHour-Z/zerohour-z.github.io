@@ -28,11 +28,11 @@ language: '中文'
 
 ### 配置文件
 
-详见 [配置文件说明](/docs/setup/configuration)。
+详见 [配置文件说明](https://astro-pure.js.org/docs/setup/configuration)。
 
 #### Waline 评论系统
 
-详见 [Waline 评论系统集成](/docs/integrations/comment)。
+详见 [Waline 评论系统集成](https://astro-pure.js.org/docs/integrations/comment)。
 
 #### 页脚
 
@@ -77,4 +77,4 @@ language: '中文'
 
 ## 部署方式
 
-详见 [部署说明](/docs/deployment)。
+详见 [部署说明](https://astro-pure.js.org/docs/deployment)。

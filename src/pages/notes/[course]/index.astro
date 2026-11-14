@@ -1,0 +1,113 @@
+---
+import type { CollectionEntry } from 'astro:content'
+
+import { getBlogCollection } from 'astro-pure/server'
+import { Button } from 'astro-pure/user'
+import PageLayout from '@/layouts/BaseLayout.astro'
+import { courses, getCourseSlug, getNoteUrl, sortCoursePosts } from '@/utils/course-notes'
+
+export const prerender = true
+
+export async function getStaticPaths() {
+  const allPosts = (await getBlogCollection()) as CollectionEntry<'blog'>[]
+  return courses
+    .map((course) => ({
+      course,
+      chapters: sortCoursePosts(allPosts.filter((p) => getCourseSlug(p) === course.slug))
+    }))
+    .filter(({ chapters }) => chapters.length > 0)
+    .map(({ course, chapters }) => ({
+      params: { course: course.slug },
+      props: { course, chapters }
+    }))
+}
+
+const { course, chapters } = Astro.props
+const first = chapters[0]
+---
+
+<PageLayout meta={{ title: course.title, description: course.description }}>
+  <Button title='Course Notes' href='/notes' variant='back' />
+  <main class='mt-6 lg:mt-10'>
+    <div id='content-header'>
+      <h1 class='page-title'>{course.title}</h1>
+      <p class='max-w-2xl text-lg text-muted-foreground'>{course.description}</p>
+      {
+        first && (
+          <a href={getNoteUrl(first)} class='start-link' data-astro-prefetch>
+            开始阅读 →
+          </a>
+        )
+      }
+    </div>
+
+    <ol class='chapter-list' id='content'>
+      {
+        chapters.map((c, i) => (
+          <li>
+            <a href={getNoteUrl(c)} class='chapter-row' data-astro-prefetch>
+              <span class='chapter-index'>{String(i + 1).padStart(2, '0')}</span>
+              <span class='chapter-title'>{c.data.title}</span>
+              <span class='chapter-arrow' aria-hidden='true'>
+                →
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </main>
+</PageLayout>
+
+<style>
+  .start-link {
+    display: inline-block;
+    margin-top: 1.75rem;
+    padding: 0.7rem 1.2rem;
+    font-weight: 700;
+    color: hsl(var(--background));
+    background-color: hsl(var(--foreground));
+    transition: background-color 0.15s;
+  }
+  .start-link:hover {
+    color: hsl(0 0% 5%);
+    background-color: hsl(var(--block-yellow));
+  }
+  .chapter-list {
+    margin-top: 3rem;
+    border-top: 2px solid hsl(var(--foreground));
+  }
+  .chapter-row {
+    display: grid;
+    grid-template-columns: 3rem 1fr auto;
+    align-items: baseline;
+    gap: 1rem;
+    padding-block: 1.1rem;
+    border-bottom: 1px solid hsl(var(--border));
+    transition:
+      background-color 0.15s,
+      padding 0.15s;
+  }
+  .chapter-row:hover {
+    color: hsl(0 0% 5%);
+    background-color: hsl(var(--block-yellow));
+    padding-inline: 0.75rem;
+  }
+  .chapter-index {
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+    color: hsl(var(--muted-foreground));
+  }
+  .chapter-row:hover .chapter-index {
+    color: inherit;
+  }
+  .chapter-title {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .chapter-arrow {
+    font-weight: 700;
+  }
+</style>

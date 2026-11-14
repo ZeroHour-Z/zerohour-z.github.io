@@ -1,0 +1,318 @@
+---
+// Docs-style layout for course notes: chapter list on the left, the note in the middle,
+// this chapter's table of contents on the right, previous / next chapter at the bottom.
+import type { MarkdownHeading } from 'astro'
+import type { CollectionEntry } from 'astro:content'
+
+import 'katex/dist/katex.min.css'
+
+import { MediumZoom } from 'astro-pure/advanced'
+import { TOC } from 'astro-pure/components/pages'
+import { getFormattedDate } from 'astro-pure/utils'
+import PageLayout from '@/layouts/BaseLayout.astro'
+import { Comment } from '@/components/waline'
+import { integ } from '@/site-config'
+import { getNoteUrl, type CourseInfo } from '@/utils/course-notes'
+import { normalizeTocHeadings } from '@/utils/toc'
+
+interface Props {
+  post: CollectionEntry<'blog'>
+  course: CourseInfo
+  chapters: CollectionEntry<'blog'>[]
+  headings: MarkdownHeading[]
+  remarkPluginFrontmatter: Record<string, unknown>
+}
+
+const { post, course, chapters, headings, remarkPluginFrontmatter } = Astro.props
+const { title, description, publishDate, updatedDate, draft, comment: enableComment } = post.data
+
+const index = chapters.findIndex((c) => c.id === post.id)
+const prev = index > 0 ? chapters[index - 1] : undefined
+const next = index >= 0 && index < chapters.length - 1 ? chapters[index + 1] : undefined
+const tocHeadings = normalizeTocHeadings(headings)
+const date = updatedDate ?? publishDate
+---
+
+<PageLayout
+  meta={{ title: `${title} · ${course.title}`, description, articleDate: date?.toISOString() }}
+>
+  <div class='note-layout'>
+    {/* Chapter navigation */}
+    <nav class='note-nav' aria-label={`${course.title} chapters`}>
+      <details class='note-nav-details' open>
+        <summary class='note-nav-summary'>
+          <a href={`/notes/${course.slug}`} class='note-course'>{course.title}</a>
+          <span class='note-nav-count'>{chapters.length} 篇</span>
+        </summary>
+        <ol class='note-chapters'>
+          {
+            chapters.map((c) => (
+              <li>
+                <a
+                  href={getNoteUrl(c)}
+                  class:list={['note-chapter', c.id === post.id && 'active']}
+                  aria-current={c.id === post.id ? 'page' : undefined}
+                  data-astro-prefetch
+                >
+                  {c.data.title}
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </details>
+    </nav>
+
+    {/* Note body */}
+    <article class='note-main min-w-0'>
+      <div id='content-header'>
+        <p class='note-breadcrumb'>
+          <a href='/notes'>Course Notes</a>
+          <span aria-hidden='true'>/</span>
+          <a href={`/notes/${course.slug}`}>{course.title}</a>
+        </p>
+        {draft && <span class='text-red-500'>(Draft)</span>}
+        <h1 class='note-title'>{title}</h1>
+        <p class='note-meta'>
+          {date && <time datetime={date.toISOString()}>{getFormattedDate(date)}</time>}
+          {remarkPluginFrontmatter.minutesRead && <span>{remarkPluginFrontmatter.minutesRead}</span>}
+        </p>
+      </div>
+
+      <div id='content' class:list={['note-body max-w-none', integ.typography.class]}>
+        <slot />
+      </div>
+
+      <nav class='note-pager' aria-label='Previous and next chapter'>
+        {
+          prev ? (
+            <a href={getNoteUrl(prev)} class='pager-link' data-astro-prefetch>
+              <span class='pager-label'>← 上一篇</span>
+              <span class='pager-title'>{prev.data.title}</span>
+            </a>
+          ) : (
+            <span />
+          )
+        }
+        {
+          next && (
+            <a href={getNoteUrl(next)} class='pager-link next' data-astro-prefetch>
+              <span class='pager-label'>下一篇 →</span>
+              <span class='pager-title'>{next.data.title}</span>
+            </a>
+          )
+        }
+      </nav>
+
+      {!draft && enableComment && <Comment class='mt-10' />}
+    </article>
+
+    {/* This chapter's TOC */}
+    <aside class='note-toc'>
+      {!!tocHeadings.length && <TOC headings={tocHeadings} />}
+    </aside>
+  </div>
+</PageLayout>
+
+{integ.mediumZoom.enable && <MediumZoom />}
+
+<script>
+  // Chapter list starts collapsed on small screens so the note is visible first
+  function collapseNoteNav() {
+    if (window.matchMedia('(max-width: 1023px)').matches) {
+      document.querySelector('.note-nav-details')?.removeAttribute('open')
+    }
+  }
+  collapseNoteNav()
+  document.addEventListener('astro:after-swap', collapseNoteNav)
+</script>
+
+<style>
+  .note-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem;
+  }
+  @media (min-width: 1024px) {
+    .note-layout {
+      grid-template-columns: 13rem minmax(0, 1fr);
+    }
+  }
+  @media (min-width: 1280px) {
+    .note-layout {
+      grid-template-columns: 13rem minmax(0, 1fr) 12rem;
+    }
+  }
+
+  /* Left: chapter list */
+  .note-nav {
+    align-self: start;
+  }
+  @media (min-width: 1024px) {
+    .note-nav {
+      position: sticky;
+      top: 5rem;
+      max-height: calc(100vh - 6rem);
+      overflow-y: auto;
+    }
+  }
+  .note-nav-summary {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid hsl(var(--foreground));
+    cursor: pointer;
+    list-style: none;
+  }
+  .note-nav-summary::-webkit-details-marker {
+    display: none;
+  }
+  .note-course {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .note-nav-count {
+    font-size: 0.75rem;
+    color: hsl(var(--muted-foreground));
+  }
+  .note-chapters {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+  }
+  .note-chapter {
+    display: block;
+    padding: 0.45rem 0.6rem;
+    border-left: 3px solid transparent;
+    font-size: 0.9rem;
+    line-height: 1.35;
+    color: hsl(var(--muted-foreground));
+    transition:
+      color 0.15s,
+      background-color 0.15s;
+  }
+  .note-chapter:hover {
+    color: hsl(var(--foreground));
+    background-color: hsl(var(--muted));
+  }
+  .note-chapter.active {
+    border-left-color: hsl(var(--primary));
+    background-color: hsl(var(--muted));
+    color: hsl(var(--foreground));
+    font-weight: 700;
+  }
+  /* Collapsible on small screens, always open on desktop */
+  @media (min-width: 1024px) {
+    .note-nav-summary {
+      cursor: default;
+      pointer-events: none;
+    }
+    .note-course {
+      pointer-events: auto;
+    }
+  }
+  @media (max-width: 1023px) {
+    .note-nav-details {
+      border: 1px solid hsl(var(--border));
+      padding: 0.75rem 1rem;
+    }
+    .note-nav-summary::after {
+      content: '▾';
+      margin-inline-start: auto;
+    }
+    .note-nav-details[open] .note-nav-summary::after {
+      content: '▴';
+    }
+  }
+
+  /* Middle: note */
+  .note-breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: hsl(var(--muted-foreground));
+  }
+  .note-breadcrumb a:hover {
+    color: hsl(var(--foreground));
+  }
+  #content-header h1.note-title {
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+    font-size: clamp(1.9rem, 3.6vw, 2.75rem);
+    line-height: 1.1;
+  }
+  .note-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.85rem;
+    color: hsl(var(--muted-foreground));
+  }
+  .note-body {
+    margin-top: 2rem;
+  }
+  /* Notes repeat the title as a leading `# heading`; the page header already shows it */
+  .note-body > :global(h1:first-child) {
+    display: none;
+  }
+
+  .note-pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-top: 4rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid hsl(var(--foreground));
+  }
+  .pager-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid hsl(var(--border));
+    transition:
+      background-color 0.15s,
+      color 0.15s;
+  }
+  .pager-link.next {
+    text-align: right;
+  }
+  .pager-link:hover {
+    color: hsl(var(--background));
+    background-color: hsl(var(--foreground));
+    border-color: hsl(var(--foreground));
+  }
+  .pager-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    opacity: 0.7;
+  }
+  .pager-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  /* Right: TOC */
+  .note-toc {
+    display: none;
+  }
+  @media (min-width: 1280px) {
+    .note-toc {
+      display: block;
+      align-self: start;
+      position: sticky;
+      top: 5rem;
+      max-height: calc(100vh - 6rem);
+      overflow-y: auto;
+    }
+  }
+</style>

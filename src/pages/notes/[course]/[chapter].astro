@@ -1,0 +1,28 @@
+---
+import { render, type CollectionEntry } from 'astro:content'
+
+import { getBlogCollection } from 'astro-pure/server'
+import NoteLayout from '@/layouts/NoteLayout.astro'
+import { courses, getChapterSlug, getCourseSlug, sortCoursePosts } from '@/utils/course-notes'
+
+export const prerender = true
+
+export async function getStaticPaths() {
+  const allPosts = (await getBlogCollection()) as CollectionEntry<'blog'>[]
+
+  return courses.flatMap((course) => {
+    const chapters = sortCoursePosts(allPosts.filter((p) => getCourseSlug(p) === course.slug))
+    return chapters.map((post) => ({
+      params: { course: course.slug, chapter: getChapterSlug(post) },
+      props: { post, course, chapters }
+    }))
+  })
+}
+
+const { post, course, chapters } = Astro.props
+const { Content, headings, remarkPluginFrontmatter } = await render(post)
+---
+
+<NoteLayout {post} {course} {chapters} {headings} {remarkPluginFrontmatter}>
+  <Content />
+</NoteLayout>
