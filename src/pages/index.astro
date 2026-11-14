@@ -1,13 +1,10 @@
 ---
 import { Image } from 'astro:assets'
 
-import { Quote } from 'astro-pure/advanced'
-import { PostPreview } from 'astro-pure/components/pages'
 import { getBlogCollection, sortMDByDate } from 'astro-pure/server'
-import { Button, Card, Icon, Label } from 'astro-pure/user'
+import { getFormattedDate } from 'astro-pure/utils'
 import PageLayout from '@/layouts/BaseLayout.astro'
 import ProjectCard from '@/components/home/ProjectCard.astro'
-import Section from '@/components/home/Section.astro'
 import SocialIcon from '@/components/SocialIcon.astro'
 import avatar from '@/assets/github.jpg'
 import config from '@/site-config'
@@ -15,215 +12,326 @@ import { isRegularBlogPost } from '@/utils/course-notes'
 
 export const prerender = true
 
-const MAX_POSTS = 10
+const MAX_POSTS = 8
 const allPosts = await getBlogCollection()
-const allPostsByDate = sortMDByDate(allPosts).filter(isRegularBlogPost).slice(0, MAX_POSTS)
+const posts = sortMDByDate(allPosts).filter(isRegularBlogPost).slice(0, MAX_POSTS)
+
+const socials = [
+  { label: 'GitHub', icon: 'github', href: 'https://github.com/ZeroHour-Z' },
+  { label: 'Netease', icon: 'netease', href: 'https://music.163.com/artist?id=33400424' },
+  {
+    label: 'Spotify',
+    icon: 'spotify',
+    href: 'https://open.spotify.com/artist/2JIwOlRMVaRlmEFDd6sQH0'
+  },
+  { label: 'Bilibili', icon: 'bilibili', href: 'https://space.bilibili.com/499513500' },
+  { label: 'X', icon: 'x', href: 'https://x.com/ZeroHour0S' },
+  { label: 'Mail', icon: 'email', href: 'mailto:2719850558@qq.com' }
+]
+
+// Latest releases on Netease Cloud Music (artist 33400424)
+const music = [
+  {
+    href: 'https://music.163.com/song?id=2734339346',
+    heading: 'Watercooler talk',
+    subheading: 'Single · 2025-08-08',
+    imagePath: '/src/assets/projects/Watercooler talk.jpg'
+  },
+  {
+    href: 'https://music.163.com/song?id=2711243097',
+    heading: 'Morning',
+    subheading: '源乐之辉 · 2025-06-02',
+    imagePath: '/src/assets/projects/Morning.jpg'
+  },
+  {
+    href: 'https://music.163.com/song?id=2692276840',
+    heading: 'Fantasy',
+    subheading: '春の季語 · 2025-04-05',
+    imagePath: '/src/assets/projects/Fantasy.jpg'
+  },
+  {
+    href: 'https://music.163.com/song?id=2683525071',
+    heading: 'Terapy',
+    subheading: '无机体 · 2025-03-15',
+    imagePath: '/src/assets/projects/Terapy.jpg'
+  }
+]
 ---
 
-<PageLayout meta={{ title: 'Home' }} highlightColor='#659EB9'>
-  <main class='flex w-full flex-col items-center'>
-    <section class='animate mb-10 flex flex-col items-center gap-y-7' id='content-header'>
-      <Image
-        src={avatar}
-        alt='profile'
-        class='home-avatar h-28 w-auto rounded-full border p-1'
-        loading='eager'
-      />
-
-      <div class='flex flex-col items-center gap-y-4'>
-        <h1 class='text-3xl font-bold'>{config.author}</h1>
-        <div class='flex flex-wrap justify-center gap-x-7 gap-y-3'>
-          <Label title='China'>
-            <Icon name='location' class='size-5' slot='icon' />
-          </Label>
-          <Label title='GitHub' as='a' href='https://github.com/ZeroHour-Z' target='_blank'>
-            <Icon name='github' class='size-5' slot='icon' />
-          </Label>
-          <Label
-            title='Netease'
-            as='a'
-            href='https://music.163.com/artist?id=33400424'
-            target='_blank'
-          >
-            <Icon name='netease' class='size-5' slot='icon' />
-          </Label>
-          <Label
-            title='Spotify'
-            as='a'
-            href='https://open.spotify.com/artist/2JIwOlRMVaRlmEFDd6sQH0'
-            target='_blank'
-          >
-            <SocialIcon name='spotify' class='size-5' slot='icon' />
-          </Label>
-          <Label
-            title='Bilibili'
-            as='a'
-            href='https://space.bilibili.com/499513500'
-            target='_blank'
-          >
-            <Icon name='bilibili' class='size-5' slot='icon' />
-          </Label>
-          <Label title='X' as='a' href='https://x.com/ZeroHour0S' target='_blank'>
-            <Icon name='x' class='size-5' slot='icon' />
-          </Label>
-          <Label title='Mail' as='a' href='mailto:2719850558@qq.com' target='_blank'>
-            <Icon name='email' class='size-5' slot='icon' />
-          </Label>
-        </div>
+<PageLayout meta={{ title: 'Home' }} wide>
+  <main class='home w-full'>
+    {/* Hero */}
+    <section class='wrap pb-16 pt-14 sm:pb-24 sm:pt-20'>
+      <div class='flex items-center gap-x-4'>
+        <Image src={avatar} alt='profile' class='size-14 rounded-full' loading='eager' />
+        <p class='eyebrow'>Developer / Music Producer / DJ</p>
       </div>
-
-      <!-- {/* Get template */}
-      <a
-        href='https://github.com/cworld1/astro-theme-pure'
-        target='_blank'
-        class='flex flex-row items-center gap-x-3 rounded-full border bg-background px-4 py-2 text-sm shadow-sm transition-shadow hover:shadow-md'
-      >
-        <span class='relative flex items-center justify-center'>
-          <span
-            class='absolute size-2 animate-ping rounded-full border border-green-400 bg-green-400 opacity-75'
-          ></span>
-          <span class='size-2 rounded-full bg-green-400'></span>
-        </span>
-        <p class='font-medium text-muted-foreground'>Get Template</p>
-      </a> -->
+      <h1 class='hero-title mt-8'>{config.author}</h1>
+      <ul class='mt-8 flex flex-wrap gap-x-6 gap-y-2 font-medium'>
+        {
+          socials.map((s) => (
+            <li>
+              <a class='ul-link inline-flex items-center gap-x-1.5' href={s.href} target='_blank'>
+                <SocialIcon name={s.icon} class='size-[1.1em]' />
+                {s.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
     </section>
 
-    <div id='content' class='animate flex flex-col gap-y-10 md:w-4/5 lg:w-5/6'>
-      <Section title='About'>
-        <p class='text-muted-foreground'>Developer / Music Producer / DJ</p>
-        <p class='text-muted-foreground'>
-          XJTU' 23 自动化，喜欢做音乐，人工智能，机器人，视觉设计。
-        </p>
-        <Button
-          title='More about me'
-          class='glass-button w-fit self-end'
-          href='/about'
-          variant='ahead'
-        />
-      </Section>
-      {
-        allPostsByDate.length > 0 && (
-          <Section title='Posts'>
-            <ul class='flex flex-col gap-y-1.5 sm:gap-y-2'>
-              {allPostsByDate.map((p, i) => (
-                <li
-                  class='scroll-reveal post-preview-item flex flex-col gap-x-2 sm:flex-row'
-                  style={`transition-delay: ${i * 50}ms`}
-                >
-                  <PostPreview post={p} />
-                </li>
-              ))}
-            </ul>
-            <Button
-              title='More posts'
-              class='glass-button w-fit self-end'
-              href='/blog'
-              variant='ahead'
-            />
-          </Section>
-        )
-      }
-
-      <Section title='Course Notes'>
-        <p class='text-muted-foreground'>自动化、机器人与计算机相关课程笔记，按课程单独整理。</p>
-        <Button
-          title='View notes'
-          class='glass-button w-fit self-end'
-          href='/notes'
-          variant='ahead'
-        />
-      </Section>
-
-      {
-        /* <Section title='Experience'>
-      <Card
-        heading='Lorem Ipsum'
-        subheading='Sit amet consectetur'
-        date='Dec 2022 - Nov 2023'
-        imagePath='/src/assets/about-astro.png'
-        altText='Lorem, ipsum dolor sit'
-        imageClass='h-12 w-auto md:-start-16'
-      >
-        <ul class='ms-4 list-disc text-muted-foreground'>
-          <li>
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dolore debitis recusandae, ut
-            molestiae laboriosam pariatur!
-
-            <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae, pariatur!</li>
-          </li>
-        </ul>
-      </Card>
-      <Card
-        heading='Lorem Ipsum'
-        subheading='Sit amet consectetur'
-        date='Dec 2022 - Nov 2023'
-        imagePath='/src/assets/about-astro.png'
-        altText='Lorem, ipsum dolor sit'
-        imageClass='h-12 w-auto md:-start-16'
-      />
-    </Section> */
-      }
-
-      <Section title='Music'>
-        <div class='grid grid-cols-1 gap-0 sm:grid-cols-1 lg:grid-cols-2'>
-          <ProjectCard
-            href='https://music.163.com/song?id=2734339346'
-            heading='Watercooler talk'
-            subheading='2025-08-08'
-            imagePath='/src/assets/projects/Watercooler talk.jpg'
-          />
-          <ProjectCard
-            href='https://music.163.com/song?id=2711243097'
-            heading='Morning'
-            subheading='2025-06-02'
-            imagePath='/src/assets/projects/Morning.jpg'
-          />
-          <ProjectCard
-            href='https://music.163.com/song?id=2692276840'
-            heading='Fantasy'
-            subheading='2025-04-05'
-            imagePath='/src/assets/projects/Fantasy.jpg'
-          />
-          <ProjectCard
-            href='https://music.163.com/song?id=2683525071'
-            heading='Terapy'
-            subheading='2025-03-15'
-            imagePath='/src/assets/projects/Terapy.jpg'
-          />
+    {/* About: orange block */}
+    <section class='block-orange'>
+      <div class='wrap grid gap-y-8 py-16 sm:py-24 md:grid-cols-[1fr_2fr] md:gap-x-12'>
+        <h2 class='section-title'>About</h2>
+        <div>
+          <p class='statement'>XJTU' 23 自动化，喜欢做音乐，人工智能，机器人，视觉设计。</p>
+          <a class='arrow-link mt-8' href='/about'>More about me →</a>
         </div>
-      </Section>
+      </div>
+    </section>
 
-      <Section title='Education'>
-        <Card
-          as='a'
-          heading='西安交通大学'
-          subheading='自动化专业 - 本科'
-          date='August 2023 - July 2027'
-          href='https://www.xjtu.edu.cn/'
-          class='card-interactive'
-        >
-          {
-            /* <ul class='ms-4 list-disc text-muted-foreground'>
-          <li>
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dolore debitis recusandae, ut
-            molestiae laboriosam pariatur!
-          </li>
-          <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae, pariatur!</li>
-        </ul> */
-          }
-        </Card>
-      </Section>
+    {/* Posts */}
+    {
+      posts.length > 0 && (
+        <section class='wrap py-16 sm:py-24'>
+          <div class='flex items-end justify-between gap-x-4'>
+            <h2 class='section-title'>Posts</h2>
+            <a class='arrow-link' href='/blog'>
+              All posts →
+            </a>
+          </div>
+          <ul class='post-list mt-10'>
+            {posts.map((p) => (
+              <li>
+                <a class='post-row' href={`/blog/${p.id}`}>
+                  <time class='post-date' datetime={p.data.publishDate?.toISOString()}>
+                    {p.data.publishDate && getFormattedDate(p.data.publishDate)}
+                  </time>
+                  <span class='post-title'>{p.data.title}</span>
+                  <span class='post-arrow' aria-hidden='true'>
+                    →
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
 
-      <!-- <Section title='Certifications'>
-        <Card
-          as='a'
-          heading='Lorem ipsum'
-          subheading='Lorem ipsum dolor sit amet, vidit suscipit at mei. Quem denique mea id. Usu ei regione indoctum dissentiunt, cu meliore fuisset mei, vel quod voluptua ne. Ex dicat impedit mel, at eum oratio possit voluptatum. Dicat ceteros cu vim. Impetus fuisset ullamcorper pri cu, his posse iisque ad, aliquam honestatis usu id.'
-          date='July 2024'
-          href='https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-        />
-      </Section> -->
-    </div>
-    <Quote class='mt-12' />
+    {/* Music: blue block */}
+    <section class='block-blue'>
+      <div class='wrap py-16 sm:py-24'>
+        <div class='flex items-end justify-between gap-x-4'>
+          <h2 class='section-title'>Music</h2>
+          <div class='flex flex-wrap justify-end gap-x-5 gap-y-2'>
+            <a
+              class='arrow-link inline-flex items-center gap-x-1.5'
+              href='https://music.163.com/artist?id=33400424'
+              target='_blank'
+            >
+              <SocialIcon name='netease' class='size-[1.1em]' />
+              Netease →
+            </a>
+            <a
+              class='arrow-link inline-flex items-center gap-x-1.5'
+              href='https://open.spotify.com/artist/2JIwOlRMVaRlmEFDd6sQH0'
+              target='_blank'
+            >
+              <SocialIcon name='spotify' class='size-[1.1em]' />
+              Spotify →
+            </a>
+          </div>
+        </div>
+        <div class='mt-10 grid grid-cols-2 gap-3 lg:grid-cols-4'>
+          {music.map((m) => <ProjectCard {...m} />)}
+        </div>
+      </div>
+    </section>
+
+    {/* Notes + Education */}
+    <section class='wrap grid gap-3 py-16 sm:py-24 md:grid-cols-2'>
+      <a class='tile block-yellow' href='/notes'>
+        <span class='tile-label'>Course Notes</span>
+        <span class='tile-text'>自动化、机器人与计算机相关课程笔记，按课程单独整理。</span>
+        <span class='tile-arrow'>View notes →</span>
+      </a>
+      <a class='tile block-lime' href='https://www.xjtu.edu.cn/' target='_blank'>
+        <span class='tile-label'>Education</span>
+        <span class='tile-text'>西安交通大学<br />自动化专业 - 本科</span>
+        <span class='tile-arrow'>August 2023 - July 2027 →</span>
+      </a>
+    </section>
   </main>
 </PageLayout>
+
+<style>
+  .wrap {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 70rem;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 640px) {
+    .wrap {
+      padding-inline: 1.75rem;
+    }
+  }
+  @media (min-width: 1024px) {
+    .wrap {
+      padding-inline: 2.5rem;
+    }
+  }
+
+  .eyebrow {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(3.5rem, 14vw, 9.5rem);
+    font-weight: 800;
+    line-height: 0.88;
+    letter-spacing: -0.05em;
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 6vw, 4rem);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+  }
+  .statement {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3.4vw, 2.5rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  /* Links */
+  .ul-link,
+  .arrow-link {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 5px;
+  }
+  .ul-link:hover {
+    color: hsl(var(--primary));
+  }
+  .arrow-link {
+    display: inline-block;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .arrow-link:hover {
+    color: inherit;
+    text-decoration-thickness: 4px;
+  }
+
+  /* Color blocks: text stays black in both themes for contrast */
+  .block-orange,
+  .block-yellow,
+  .block-lime {
+    color: hsl(0 0% 5%);
+  }
+  .block-orange {
+    background-color: hsl(var(--block-orange));
+  }
+  .block-yellow {
+    background-color: hsl(var(--block-yellow));
+  }
+  .block-lime {
+    background-color: hsl(var(--block-lime));
+  }
+  .block-blue {
+    background-color: hsl(var(--block-blue));
+    color: hsl(0 0% 100%);
+  }
+
+  /* Post list */
+  .post-list {
+    border-top: 2px solid hsl(var(--foreground));
+  }
+  .post-row {
+    display: grid;
+    grid-template-columns: 9rem 1fr auto;
+    align-items: baseline;
+    gap: 1rem;
+    padding-block: 1.1rem;
+    border-bottom: 1px solid hsl(var(--border));
+    transition:
+      background-color 0.15s,
+      padding 0.15s;
+  }
+  .post-row:hover {
+    color: inherit;
+    background-color: hsl(var(--block-yellow));
+    color: hsl(0 0% 5%);
+    padding-inline: 0.75rem;
+  }
+  .post-date {
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+    color: hsl(var(--muted-foreground));
+  }
+  .post-row:hover .post-date {
+    color: inherit;
+  }
+  .post-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .post-arrow {
+    font-weight: 700;
+  }
+  @media (max-width: 639px) {
+    .post-row {
+      grid-template-columns: 1fr auto;
+      gap: 0.25rem 1rem;
+    }
+    .post-date {
+      grid-column: 1 / -1;
+    }
+  }
+
+  /* Tiles */
+  .tile {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-height: 16rem;
+    padding: 2rem;
+    transition: transform 0.15s;
+  }
+  .tile:hover {
+    color: hsl(0 0% 5%);
+    transform: translateY(-4px);
+  }
+  .tile-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .tile-text {
+    flex: 1;
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 2.6vw, 2rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+  .tile-arrow {
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 5px;
+  }
+</style>

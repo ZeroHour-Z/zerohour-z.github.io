@@ -1,0 +1,166 @@
+---
+// Local replacement for astro-pure's Header: full-width flat bar, bold type.
+import { Icon } from 'astro-pure/user'
+import config from '@/site-config'
+
+const path = Astro.url.pathname
+const isActive = (link: string) => link !== '/' && path.startsWith(link)
+---
+
+<site-header class='site-header sticky top-0 z-50 w-full border-b bg-background'>
+  <div class='mx-auto flex h-14 w-full max-w-[70rem] items-center justify-between px-4 sm:px-7 lg:px-10'>
+    <a class='brand text-lg font-bold' href='/' aria-label='Home'>{config.title}</a>
+
+    <nav class='hidden items-center gap-x-1 sm:flex' aria-label='Main'>
+      {
+        (config.header.menu ?? []).map((item) => (
+          <a
+            href={item.link}
+            class:list={['nav-link px-3 py-1.5 font-medium', isActive(item.link) && 'active']}
+          >
+            {item.title}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class='flex items-center gap-x-2'>
+      <a class='icon-btn' href='/search' title='Search'>
+        <span class='sr-only'>Search</span>
+        <Icon name='search' class='size-5' />
+      </a>
+      <button id='toggleDarkMode' class='icon-btn' title='Theme'>
+        <span class='sr-only'>Toggle theme</span>
+        <Icon class='system size-5' name='computer' />
+        <Icon class='light hidden size-5' name='sun' />
+        <Icon class='dark hidden size-5' name='moon' />
+      </button>
+      <button id='toggleMenu' class='icon-btn sm:hidden' aria-expanded='false' title='Menu'>
+        <span class='sr-only'>Menu</span>
+        <Icon class='size-5' name='menu' />
+      </button>
+    </div>
+  </div>
+
+  {/* Mobile menu */}
+  <nav id='mobileMenu' class='hidden border-t bg-background sm:hidden' aria-label='Mobile'>
+    {
+      (config.header.menu ?? []).map((item) => (
+        <a
+          href={item.link}
+          class:list={[
+            'block border-b px-4 py-4 text-2xl font-bold',
+            isActive(item.link) && 'text-primary'
+          ]}
+        >
+          {item.title}
+        </a>
+      ))
+    }
+  </nav>
+</site-header>
+
+<script is:inline>
+  {
+    const btn = document.getElementById('toggleDarkMode')
+    if (btn) btn.dataset.theme = localStorage.getItem('theme') || 'system'
+  }
+</script>
+<script>
+  // Same behavior as astro-pure's setTheme/showToast. Inlined because importing the
+  // `astro-pure/utils` barrel makes Vite pre-bundle it, which stalls the dev server.
+  const themes = ['system', 'dark', 'light']
+
+  function setTheme(): string {
+    const current = localStorage.getItem('theme') ?? 'system'
+    const next = themes[(themes.indexOf(current) + 1) % themes.length]
+    localStorage.setItem('theme', next)
+    const dark =
+      next === 'dark' ||
+      (next === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    document.documentElement.classList.toggle('dark', dark)
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', dark ? '#0B0B10' : '#FCFCFD')
+    return next
+  }
+
+  function showToast(message: string) {
+    document.dispatchEvent(new CustomEvent('toast', { detail: { message } }))
+  }
+
+  class SiteHeader extends HTMLElement {
+    connectedCallback() {
+      const darkModeBtn = this.querySelector('#toggleDarkMode') as HTMLElement
+      darkModeBtn.addEventListener('click', () => {
+        const newTheme = setTheme()
+        darkModeBtn.dataset.theme = newTheme
+        showToast(`Set theme to ${newTheme}`)
+      })
+
+      const menuBtn = this.querySelector('#toggleMenu') as HTMLElement
+      const menu = this.querySelector('#mobileMenu') as HTMLElement
+      menuBtn.addEventListener('click', () => {
+        const open = menu.classList.toggle('hidden') === false
+        menuBtn.setAttribute('aria-expanded', String(open))
+      })
+    }
+  }
+
+  if (!customElements.get('site-header')) customElements.define('site-header', SiteHeader)
+</script>
+
+<style>
+  .brand {
+    font-family: var(--font-display);
+    letter-spacing: -0.03em;
+  }
+  .nav-link {
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
+    transition: text-decoration-color 0.15s;
+  }
+  .nav-link:hover {
+    color: inherit;
+    text-decoration-color: currentColor;
+  }
+  .nav-link.active {
+    text-decoration-color: hsl(var(--primary));
+  }
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1px solid transparent;
+    transition:
+      background-color 0.15s,
+      color 0.15s;
+  }
+  .icon-btn:hover {
+    color: hsl(var(--background));
+    background-color: hsl(var(--foreground));
+  }
+
+  #toggleDarkMode {
+    &[data-theme='dark'] {
+      & .system {
+        display: none;
+      }
+      & .dark {
+        display: block;
+      }
+    }
+    &[data-theme='light'] {
+      & .system {
+        display: none;
+      }
+      & .light {
+        display: block;
+      }
+    }
+  }
+</style>
