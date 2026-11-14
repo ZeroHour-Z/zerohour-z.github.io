@@ -1,9 +1,4 @@
-# Created by https://www.toptal.com/developers/gitignore/api/astro,vim,visualstudiocode,vercel
-# Edit at https://www.toptal.com/developers/gitignore?templates=astro,vim,visualstudiocode,vercel
-
 ### Astro ###
-# Gitignore template for Astro projects
-# Ignore content collection generated files
 .astro
 
 ### Vercel ###
@@ -83,10 +78,4 @@ bunfig.toml
 /src/content/blog/test.*
 /test/
 
-# blog drafts & workspace
-src/content/blog/deep-learning/
-src/content/blog/.obsidian/
-src/content/blog/daily/2510/251025_om1.md
-src/content/blog/daily/2603/实验.md
-src/content/blog/daily/2603/0302.md
-src/content/blog/motion_control_system/第 1 章 闭环控制的直流调速系统.md
+.claude
