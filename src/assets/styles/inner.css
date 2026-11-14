@@ -92,6 +92,24 @@ toc-heading > h2 {
   border-bottom: 2px solid hsl(var(--foreground));
 }
 
+/* TOC levels. The theme indents every heading below h2 the same way, so h3 and
+   h4 looked identical. Its list nests one <ul> per level, which lets us tell them apart. */
+toc-heading > ul > li > div > a.toc-item {
+  font-weight: 600;
+}
+toc-heading ul ul a.toc-item {
+  padding-inline-start: 1.75rem;
+  font-size: 0.95em;
+}
+toc-heading ul ul ul a.toc-item {
+  padding-inline-start: 3rem;
+  font-size: 0.85em;
+  color: hsl(var(--muted-foreground));
+}
+toc-heading ul ul ul ul a.toc-item {
+  padding-inline-start: 4.25rem;
+}
+
 /* Previous / next links under articles */
 .bottom a.rounded-xl {
   border: 1px solid hsl(var(--border));
