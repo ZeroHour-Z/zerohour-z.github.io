@@ -4,7 +4,7 @@ import { Image } from 'astro:assets'
 import { getBlogCollection, sortMDByDate } from 'astro-pure/server'
 import { getFormattedDate } from 'astro-pure/utils'
 import PageLayout from '@/layouts/BaseLayout.astro'
-import ProjectCard from '@/components/home/ProjectCard.astro'
+import MusicCard from '@/components/home/MusicCard.astro'
 import SocialIcon from '@/components/SocialIcon.astro'
 import avatar from '@/assets/github.jpg'
 import config from '@/site-config'
@@ -71,9 +71,9 @@ const music = [
         {
           socials.map((s) => (
             <li>
-              <a class='ul-link inline-flex items-center gap-x-1.5' href={s.href} target='_blank'>
+              <a class='icon-link' href={s.href} target='_blank'>
                 <SocialIcon name={s.icon} class='size-[1.1em]' />
-                {s.label}
+                <span class='link-text'>{s.label}</span>
               </a>
             </li>
           ))
@@ -127,26 +127,18 @@ const music = [
         <div class='flex items-end justify-between gap-x-4'>
           <h2 class='section-title'>Music</h2>
           <div class='flex flex-wrap justify-end gap-x-5 gap-y-2'>
-            <a
-              class='arrow-link inline-flex items-center gap-x-1.5'
-              href='https://music.163.com/artist?id=33400424'
-              target='_blank'
-            >
+            <a class='icon-link font-bold' href='https://music.163.com/artist?id=33400424' target='_blank'>
               <SocialIcon name='netease' class='size-[1.1em]' />
-              Netease →
+              <span class='link-text'>Netease →</span>
             </a>
-            <a
-              class='arrow-link inline-flex items-center gap-x-1.5'
-              href='https://open.spotify.com/artist/2JIwOlRMVaRlmEFDd6sQH0'
-              target='_blank'
-            >
+            <a class='icon-link font-bold' href='https://open.spotify.com/artist/2JIwOlRMVaRlmEFDd6sQH0' target='_blank'>
               <SocialIcon name='spotify' class='size-[1.1em]' />
-              Spotify →
+              <span class='link-text'>Spotify →</span>
             </a>
           </div>
         </div>
-        <div class='mt-10 grid grid-cols-2 gap-3 lg:grid-cols-4'>
-          {music.map((m) => <ProjectCard {...m} />)}
+        <div class='mt-10 grid grid-cols-2 gap-x-4 gap-y-8 lg:grid-cols-4'>
+          {music.map((m) => <MusicCard {...m} />)}
         </div>
       </div>
     </section>
@@ -222,6 +214,25 @@ const music = [
   }
   .ul-link:hover {
     color: hsl(var(--primary));
+  }
+  /* Icon + text link: never splits, only the text is underlined */
+  .icon-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+  .icon-link .link-text {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 5px;
+  }
+  .icon-link:hover {
+    color: inherit;
+  }
+  .icon-link:hover .link-text {
+    text-decoration-thickness: 4px;
   }
   .arrow-link {
     display: inline-block;

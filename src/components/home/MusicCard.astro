@@ -1,0 +1,107 @@
+---
+// Flat album card for the home Music block: square cover, title and release info underneath.
+import type { ImageMetadata } from 'astro'
+import { Image } from 'astro:assets'
+
+interface Props {
+  href: string
+  heading: string
+  subheading: string
+  imagePath: string
+}
+
+const { href, heading, subheading, imagePath } = Astro.props
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/projects/*.{jpeg,jpg,png,gif,avif,webp}'
+)
+if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in src/assets/projects`)
+---
+
+<a class='music-card group' href={href} target='_blank'>
+  <div class='cover'>
+    <Image src={images[imagePath]()} alt={heading} class='cover-img' loading='lazy' />
+    <span class='play' aria-hidden='true'>
+      <svg viewBox='0 0 24 24' fill='currentColor'><path d='M8 5.5v13l11-6.5z'></path></svg>
+    </span>
+  </div>
+  <p class='title'>{heading}</p>
+  <p class='meta'>{subheading}</p>
+</a>
+
+<style>
+  .music-card {
+    display: flex;
+    flex-direction: column;
+    color: inherit;
+  }
+  .music-card:hover {
+    color: inherit;
+  }
+  .cover {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    outline: 3px solid transparent;
+    outline-offset: 3px;
+    transition: outline-color 0.15s;
+  }
+  .music-card:hover .cover,
+  .music-card:focus-visible .cover {
+    outline-color: currentColor;
+  }
+  .cover :global(.cover-img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .play {
+    position: absolute;
+    right: 0.6rem;
+    bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    background: hsl(0 0% 5%);
+    color: hsl(0 0% 100%);
+    opacity: 0;
+    transform: translateY(6px);
+    transition:
+      opacity 0.15s,
+      transform 0.15s;
+  }
+  .play svg {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+  .music-card:hover .play,
+  .music-card:focus-visible .play {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .title {
+    margin-top: 0.9rem;
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+  }
+  .music-card:hover .title {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+  .meta {
+    margin-top: 0.2rem;
+    font-size: 0.8rem;
+    opacity: 0.75;
+  }
+  @media (hover: none) {
+    .play {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>
