@@ -110,7 +110,9 @@ function getCoursePostRank(post: PostLike) {
   const title = getPostTitle(post).toLowerCase()
   const text = `${slug} ${title}`
 
-  if (slug === 'index' || text.includes('course-overview') || text.includes('章节目录')) {
+  // `<course>/index.md` has the bare course id
+  const isCourseIndex = !post.id.includes('/')
+  if (isCourseIndex || slug === 'index' || text.includes('course-overview') || text.includes('章节目录')) {
     return -20
   }
   if (text.includes('内容总结')) {
@@ -153,4 +155,37 @@ export function sortCoursePosts<T extends PostLike>(posts: T[]) {
       sensitivity: 'base'
     })
   })
+}
+
+const sectionLabels: [maxRank: number, label: string][] = [
+  [-1, '课程总览'],
+  [99, '章节笔记'],
+  [199, '课件摘要'],
+  [599, '其他'],
+  [899, '复习资料'],
+  [Infinity, '原始课件']
+]
+
+function getSectionLabel(post: PostLike) {
+  const rank = getCoursePostRank(post)
+  return sectionLabels.find(([max]) => rank <= max)![1]
+}
+
+export type CourseSection<T> = { label: string; posts: T[] }
+
+/**
+ * Split an already sorted course into labelled sections (overview, chapter notes,
+ * slide summaries, review material...), keeping the sorted order. A course whose notes
+ * all fall into one section returns a single section with an empty label.
+ */
+export function getCourseSections<T extends PostLike>(sortedPosts: T[]): CourseSection<T>[] {
+  const sections: CourseSection<T>[] = []
+  for (const post of sortedPosts) {
+    const label = getSectionLabel(post)
+    const last = sections.at(-1)
+    if (last?.label === label) last.posts.push(post)
+    else sections.push({ label, posts: [post] })
+  }
+  if (sections.length === 1) sections[0].label = ''
+  return sections
 }

@@ -4,7 +4,13 @@ import type { CollectionEntry } from 'astro:content'
 import { getBlogCollection } from 'astro-pure/server'
 import { Button } from 'astro-pure/user'
 import PageLayout from '@/layouts/BaseLayout.astro'
-import { courses, getCourseSlug, getNoteUrl, sortCoursePosts } from '@/utils/course-notes'
+import {
+  courses,
+  getCourseSections,
+  getCourseSlug,
+  getNoteUrl,
+  sortCoursePosts
+} from '@/utils/course-notes'
 
 export const prerender = true
 
@@ -24,6 +30,8 @@ export async function getStaticPaths() {
 
 const { course, chapters } = Astro.props
 const first = chapters[0]
+const sections = getCourseSections(chapters)
+let counter = 0
 ---
 
 <PageLayout meta={{ title: course.title, description: course.description }}>
@@ -41,21 +49,28 @@ const first = chapters[0]
       }
     </div>
 
-    <ol class='chapter-list' id='content'>
+    <div id='content'>
       {
-        chapters.map((c, i) => (
-          <li>
-            <a href={getNoteUrl(c)} class='chapter-row' data-astro-prefetch>
-              <span class='chapter-index'>{String(i + 1).padStart(2, '0')}</span>
-              <span class='chapter-title'>{c.data.title}</span>
-              <span class='chapter-arrow' aria-hidden='true'>
-                →
-              </span>
-            </a>
-          </li>
+        sections.map((section) => (
+          <section class='chapter-section'>
+            {section.label && <h2 class='chapter-section-title'>{section.label}</h2>}
+            <ol class='chapter-list'>
+              {section.posts.map((c) => (
+                <li>
+                  <a href={getNoteUrl(c)} class='chapter-row' data-astro-prefetch>
+                    <span class='chapter-index'>{String(++counter).padStart(2, '0')}</span>
+                    <span class='chapter-title'>{c.data.title}</span>
+                    <span class='chapter-arrow' aria-hidden='true'>
+                      →
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </section>
         ))
       }
-    </ol>
+    </div>
   </main>
 </PageLayout>
 
@@ -73,8 +88,17 @@ const first = chapters[0]
     color: hsl(0 0% 5%);
     background-color: hsl(var(--block-yellow));
   }
-  .chapter-list {
+  .chapter-section {
     margin-top: 3rem;
+  }
+  .chapter-section-title {
+    margin-bottom: 0.75rem;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .chapter-list {
     border-top: 2px solid hsl(var(--foreground));
   }
   .chapter-row {

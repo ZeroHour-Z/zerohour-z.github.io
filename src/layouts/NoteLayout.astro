@@ -12,7 +12,7 @@ import { getFormattedDate } from 'astro-pure/utils'
 import PageLayout from '@/layouts/BaseLayout.astro'
 import { Comment } from '@/components/waline'
 import { integ } from '@/site-config'
-import { getNoteUrl, type CourseInfo } from '@/utils/course-notes'
+import { getCourseSections, getNoteUrl, type CourseInfo } from '@/utils/course-notes'
 import { normalizeTocHeadings } from '@/utils/toc'
 
 interface Props {
@@ -30,6 +30,7 @@ const index = chapters.findIndex((c) => c.id === post.id)
 const prev = index > 0 ? chapters[index - 1] : undefined
 const next = index >= 0 && index < chapters.length - 1 ? chapters[index + 1] : undefined
 const tocHeadings = normalizeTocHeadings(headings)
+const sections = getCourseSections(chapters)
 const date = updatedDate ?? publishDate
 ---
 
@@ -44,22 +45,27 @@ const date = updatedDate ?? publishDate
           <a href={`/notes/${course.slug}`} class='note-course'>{course.title}</a>
           <span class='note-nav-count'>{chapters.length} 篇</span>
         </summary>
-        <ol class='note-chapters'>
-          {
-            chapters.map((c) => (
-              <li>
-                <a
-                  href={getNoteUrl(c)}
-                  class:list={['note-chapter', c.id === post.id && 'active']}
-                  aria-current={c.id === post.id ? 'page' : undefined}
-                  data-astro-prefetch
-                >
-                  {c.data.title}
-                </a>
-              </li>
-            ))
-          }
-        </ol>
+        {
+          sections.map((section) => (
+            <div class='note-section'>
+              {section.label && <p class='note-section-label'>{section.label}</p>}
+              <ol class='note-chapters'>
+                {section.posts.map((c) => (
+                  <li>
+                    <a
+                      href={getNoteUrl(c)}
+                      class:list={['note-chapter', c.id === post.id && 'active']}
+                      aria-current={c.id === post.id ? 'page' : undefined}
+                      data-astro-prefetch
+                    >
+                      {c.data.title}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ))
+        }
       </details>
     </nav>
 
@@ -179,8 +185,16 @@ const date = updatedDate ?? publishDate
     font-size: 0.75rem;
     color: hsl(var(--muted-foreground));
   }
+  .note-section-label {
+    margin-top: 1.1rem;
+    padding-inline: 0.6rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: hsl(var(--foreground));
+  }
   .note-chapters {
-    margin-top: 0.5rem;
+    margin-top: 0.35rem;
     display: flex;
     flex-direction: column;
   }
