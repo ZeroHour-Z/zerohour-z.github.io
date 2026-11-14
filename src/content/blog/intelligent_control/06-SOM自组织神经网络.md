@@ -1,5 +1,5 @@
 ---
-title: "06 SOM 自组织神经网络"
+title: "第 6 章 SOM 自组织神经网络"
 publishDate: 2026-05-12
 description: "SOM自组织神经网络：竞争学习、获胜节点、优胜邻域和Kohonen算法。"
 tags:

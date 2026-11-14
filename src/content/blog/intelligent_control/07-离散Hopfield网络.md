@@ -1,5 +1,5 @@
 ---
-title: "07 离散 Hopfield 网络"
+title: "第 7 章 离散 Hopfield 网络"
 publishDate: 2026-05-12
 description: "离散Hopfield网络：状态更新、吸引子、能量函数、稳定性和外积和法。"
 tags:
