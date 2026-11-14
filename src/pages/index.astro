@@ -10,6 +10,8 @@ import avatar from '@/assets/github.jpg'
 import config from '@/site-config'
 import { isRegularBlogPost } from '@/utils/course-notes'
 
+export const prerender = true
+
 const MAX_POSTS = 8
 const allPosts = await getBlogCollection()
 const posts = sortMDByDate(allPosts).filter(isRegularBlogPost).slice(0, MAX_POSTS)
