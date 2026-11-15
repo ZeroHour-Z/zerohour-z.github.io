@@ -176,8 +176,10 @@ const { class: className } = Astro.props
       margin-inline-start: 0;
     }
   }
-  #waline :global(.wl-item, .wl-card-item) {
-    overflow: hidden;
+  /* Keep long content inside the card without `overflow: hidden`, which clipped the
+     emoji / GIF popups of the reply box opened inside a comment */
+  #waline :global(.wl-card) {
+    min-width: 0;
   }
 
   /* Reaction buttons */
