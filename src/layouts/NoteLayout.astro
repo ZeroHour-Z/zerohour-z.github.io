@@ -12,13 +12,13 @@ import { getFormattedDate } from 'astro-pure/utils'
 import PageLayout from '@/layouts/BaseLayout.astro'
 import { Comment } from '@/components/waline'
 import { integ } from '@/site-config'
-import { getCourseSections, getNoteUrl, type CourseInfo } from '@/utils/course-notes'
+import { getCourseSections, getCourseUrl, getNoteUrl, type CourseInfo } from '@/utils/course-notes'
 import { normalizeTocHeadings } from '@/utils/toc'
 
 interface Props {
-  post: CollectionEntry<'blog'>
+  post: CollectionEntry<'docs'>
   course: CourseInfo
-  chapters: CollectionEntry<'blog'>[]
+  chapters: CollectionEntry<'docs'>[]
   headings: MarkdownHeading[]
   remarkPluginFrontmatter: Record<string, unknown>
 }
@@ -42,7 +42,7 @@ const date = updatedDate ?? publishDate
     <nav class='note-nav' aria-label={`${course.title} chapters`}>
       <details class='note-nav-details' open>
         <summary class='note-nav-summary'>
-          <a href={`/notes/${course.slug}`} class='note-course'>{course.title}</a>
+          <a href={getCourseUrl(course.slug)} class='note-course'>{course.title}</a>
           <span class='note-nav-count'>{chapters.length} 篇</span>
         </summary>
         {
@@ -73,9 +73,9 @@ const date = updatedDate ?? publishDate
     <article class='note-main min-w-0'>
       <div id='content-header'>
         <p class='note-breadcrumb'>
-          <a href='/notes'>Course Notes</a>
+          <a href='/docs'>Docs</a>
           <span aria-hidden='true'>/</span>
-          <a href={`/notes/${course.slug}`}>{course.title}</a>
+          <a href={getCourseUrl(course.slug)}>{course.title}</a>
         </p>
         {draft && <span class='text-red-500'>(Draft)</span>}
         <h1 class='note-title'>{title}</h1>

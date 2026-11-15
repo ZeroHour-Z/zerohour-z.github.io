@@ -1,4 +1,4 @@
-import { defineCollection, z } from 'astro:content'
+import { defineCollection, z, type SchemaContext } from 'astro:content'
 import { glob } from 'astro/loaders'
 
 function removeDupsAndLowerCase(array: string[]) {
@@ -8,12 +8,8 @@ function removeDupsAndLowerCase(array: string[]) {
   return Array.from(distinctItems)
 }
 
-// Define blog collection
-const blog = defineCollection({
-  // Load Markdown and MDX files in the `src/content/blog/` directory.
-  loader: glob({ base: './src/content/blog', pattern: '**/*.{md,mdx}' }),
-  // Required
-  schema: ({ image }) =>
+// Shared frontmatter schema for blog posts and course docs
+const postSchema = ({ image }: SchemaContext) =>
     z.object({
       // Required
       title: z.string().max(60),
@@ -38,6 +34,17 @@ const blog = defineCollection({
       // Special fields
       comment: z.boolean().default(true)
     })
+
+// Blog posts: `src/content/blog/`
+const blog = defineCollection({
+  loader: glob({ base: './src/content/blog', pattern: '**/*.{md,mdx}' }),
+  schema: postSchema
 })
 
-export const collections = { blog }
+// Course notes, shown as docs: `src/content/docs/<course>/<chapter>.md`
+const docs = defineCollection({
+  loader: glob({ base: './src/content/docs', pattern: '**/*.{md,mdx}' }),
+  schema: postSchema
+})
+
+export const collections = { blog, docs }

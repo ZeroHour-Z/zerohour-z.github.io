@@ -60,7 +60,7 @@ export function getCourseInfo(slug: string) {
 
 export function getCourseUrl(postOrSlug: PostLike | string) {
   const slug = typeof postOrSlug === 'string' ? postOrSlug : getCourseSlug(postOrSlug)
-  return `/notes/${slug}`
+  return `/docs/${slug}`
 }
 
 /** Chapter part of a course note id, e.g. `第-1-章-绪论` for `automatic_control_theory/第-1-章-绪论`. */
@@ -69,9 +69,9 @@ export function getChapterSlug(post: PostLike) {
   return post.id.split('/').slice(1).join('/') || 'overview'
 }
 
-/** Docs-style URL of a course note: `/notes/<course>/<chapter>`. */
+/** URL of a course note: `/docs/<course>/<chapter>`. */
 export function getNoteUrl(post: PostLike) {
-  return `/notes/${getCourseSlug(post)}/${getChapterSlug(post)}`
+  return `/docs/${getCourseSlug(post)}/${getChapterSlug(post)}`
 }
 
 export function getCourseGroups<T extends PostLike>(posts: T[]) {

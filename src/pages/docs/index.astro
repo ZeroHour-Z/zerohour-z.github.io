@@ -2,16 +2,16 @@
 import { getBlogCollection } from 'astro-pure/server'
 import { Button, Icon } from 'astro-pure/user'
 import PageLayout from '@/layouts/BaseLayout.astro'
-import { getCourseGroups, isCourseNote } from '@/utils/course-notes'
+import { getCourseGroups, getCourseUrl } from '@/utils/course-notes'
 
 export const prerender = true
 
-const coursePosts = (await getBlogCollection()).filter(isCourseNote)
+const coursePosts = await getBlogCollection('docs')
 const courseGroups = getCourseGroups(coursePosts)
 
 const meta = {
   description: '按课程整理的学习笔记、课件摘要与复习资料',
-  title: 'Course Notes'
+  title: 'Docs'
 }
 ---
 
@@ -19,7 +19,7 @@ const meta = {
   <Button title='Back' href='/' variant='back' />
   <main class='mt-6 lg:mt-10'>
     <div id='content-header' class='animate'>
-      <h1 class='page-title mb-3 mt-6 text-3xl font-medium sm:mt-10'>Course Notes</h1>
+      <h1 class='page-title mb-3 mt-6 text-3xl font-medium sm:mt-10'>Docs</h1>
       <p class='max-w-2xl text-muted-foreground'>
         课程笔记单独归档在这里，按课程目录组织，和日常 blog、论文阅读、教程记录分开浏览。
       </p>
@@ -36,7 +36,7 @@ const meta = {
         >
           {courseGroups.map(({ course, posts }) => (
             <article class='scroll-reveal rounded-lg border bg-background p-5 transition-colors hover:bg-muted'>
-              <a href={`/notes/${course.slug}`} class='group flex h-full flex-col' data-astro-prefetch>
+              <a href={getCourseUrl(course.slug)} class='group flex h-full flex-col' data-astro-prefetch>
                 <div class='flex items-start justify-between gap-3'>
                   <h2 class='flex items-center text-xl font-medium group-hover:text-primary'>
                     <Icon name='document' class='me-2 size-5 shrink-0' />

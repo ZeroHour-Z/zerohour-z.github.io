@@ -1,0 +1,14 @@
+---
+// Course notes moved to /docs/<course>; keep old /notes/<course> links working.
+import { getBlogCollection } from 'astro-pure/server'
+import { getCourseGroups, getCourseUrl } from '@/utils/course-notes'
+
+export const prerender = true
+
+export async function getStaticPaths() {
+  const groups = getCourseGroups(await getBlogCollection('docs'))
+  return groups.map(({ course }) => ({ params: { course: course.slug } }))
+}
+
+return Astro.redirect(encodeURI(getCourseUrl(Astro.params.course!)), 301)
+---

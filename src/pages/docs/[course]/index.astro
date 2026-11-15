@@ -15,7 +15,7 @@ import {
 export const prerender = true
 
 export async function getStaticPaths() {
-  const allPosts = (await getBlogCollection()) as CollectionEntry<'blog'>[]
+  const allPosts = (await getBlogCollection('docs')) as CollectionEntry<'docs'>[]
   return courses
     .map((course) => ({
       course,
@@ -35,7 +35,7 @@ let counter = 0
 ---
 
 <PageLayout meta={{ title: course.title, description: course.description }}>
-  <Button title='Course Notes' href='/notes' variant='back' />
+  <Button title='Docs' href='/docs' variant='back' />
   <main class='mt-6 lg:mt-10'>
     <div id='content-header'>
       <h1 class='page-title'>{course.title}</h1>

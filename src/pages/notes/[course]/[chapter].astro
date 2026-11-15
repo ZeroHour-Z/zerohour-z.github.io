@@ -1,0 +1,17 @@
+---
+// Course notes moved to /docs/<course>/<chapter>; keep old /notes/... links working.
+import { getBlogCollection } from 'astro-pure/server'
+import { getChapterSlug, getCourseSlug, getNoteUrl } from '@/utils/course-notes'
+
+export const prerender = true
+
+export async function getStaticPaths() {
+  const docs = await getBlogCollection('docs')
+  return docs.map((post) => ({
+    params: { course: getCourseSlug(post), chapter: getChapterSlug(post) },
+    props: { to: getNoteUrl(post) }
+  }))
+}
+
+return Astro.redirect(encodeURI(Astro.props.to), 301)
+---

@@ -3,29 +3,36 @@ import { render, type CollectionEntry } from 'astro:content'
 
 import { getBlogCollection, sortMDByDate } from 'astro-pure/server'
 import PostLayout from '@/layouts/BlogPost.astro'
-import { getNoteUrl, isCourseNote, isRegularBlogPost } from '@/utils/course-notes'
+import { getNoteUrl, isRegularBlogPost } from '@/utils/course-notes'
 
 export const prerender = true
 
 export async function getStaticPaths() {
   const posts = sortMDByDate(await getBlogCollection())
   const regularPosts = posts.filter(isRegularBlogPost)
-  return posts.map((post) => ({
-    params: { id: post.id },
-    props: { post, posts: regularPosts }
-  }))
+  // Course notes used to live at /blog/<course>/<chapter>; they now have their own
+  // docs collection, so generate redirect pages for the old URLs.
+  const docs = await getBlogCollection('docs')
+  return [
+    ...posts.map((post) => ({
+      params: { id: post.id },
+      props: { post, posts: regularPosts }
+    })),
+    ...docs.map((doc) => ({
+      params: { id: doc.id },
+      props: { redirectTo: getNoteUrl(doc) }
+    }))
+  ]
 }
 
-type Props = {
-  post: CollectionEntry<'blog'>
-  posts: CollectionEntry<'blog'>[]
-}
+type Props =
+  | { post: CollectionEntry<'blog'>; posts: CollectionEntry<'blog'>[]; redirectTo?: undefined }
+  | { redirectTo: string; post?: undefined; posts?: undefined }
 
-const { post, posts } = Astro.props
+const { post, posts, redirectTo } = Astro.props
 
-// Course notes moved to /notes/<course>/<chapter>; keep old /blog/... links working.
-if (isCourseNote(post)) {
-  return Astro.redirect(encodeURI(getNoteUrl(post)), 301)
+if (redirectTo !== undefined) {
+  return Astro.redirect(encodeURI(redirectTo), 301)
 }
 
 const { Content, headings, remarkPluginFrontmatter } = await render(post)
