@@ -50,6 +50,8 @@ const { class: className } = Astro.props
         this.waline = walineInit({
           el,
           serverURL: walineConfig.server || '',
+          // Same key on every deployment: GitHub Pages serves /about/, Vercel serves /about
+          path: decodeURI(window.location.pathname).replace(/(.)\/+$/, '$1'),
           emoji,
           reaction: ['/icons/heart-item.svg'],
           ...walineConfig.additionalConfigs

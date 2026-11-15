@@ -10,7 +10,8 @@ interface Props {
 
 const { view, comment, class: className, ...props } = Astro.props
 
-const path = Astro.url.pathname
+// Same key on every deployment: GitHub Pages serves /about/, Vercel serves /about
+const path = decodeURI(Astro.url.pathname).replace(/(.)\/+$/, '$1')
 ---
 
 <div class={cn('text-base text-sm text-muted-foreground', className)} {...props}>

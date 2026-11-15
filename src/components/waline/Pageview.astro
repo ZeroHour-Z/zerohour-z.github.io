@@ -18,7 +18,8 @@ import config from '@/site-config'
       if (el) {
         pageview.pageviewCount({
           serverURL: walineServer,
-          path: window.location.pathname
+          // Same key on every deployment: GitHub Pages serves /about/, Vercel serves /about
+          path: decodeURI(window.location.pathname).replace(/(.)\/+$/, '$1')
         })
       }
     } catch (e) {
