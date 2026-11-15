@@ -21,6 +21,7 @@
       "@/plugins/*": ["src/plugins/*"],
       "@/pages/*": ["src/pages/*"],
       "@/utils/*": ["src/utils/*"],
+      "@/data/*": ["src/data/*"],
       "@/site-config": ["src/site.config.ts"]
     }
   },

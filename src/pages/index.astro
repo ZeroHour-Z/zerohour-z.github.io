@@ -5,6 +5,7 @@ import { getBlogCollection, sortMDByDate } from 'astro-pure/server'
 import { getFormattedDate } from 'astro-pure/utils'
 import PageLayout from '@/layouts/BaseLayout.astro'
 import MusicCard from '@/components/home/MusicCard.astro'
+import { releases } from '@/data/music'
 import SocialIcon from '@/components/SocialIcon.astro'
 import avatar from '@/assets/github.jpg'
 import config from '@/site-config'
@@ -29,33 +30,16 @@ const socials = [
   { label: 'Mail', icon: 'email', href: 'mailto:2719850558@qq.com' }
 ]
 
-// Latest releases on Netease Cloud Music (artist 33400424)
-const music = [
-  {
-    href: 'https://music.163.com/song?id=2734339346',
-    heading: 'Watercooler talk',
-    subheading: 'Single · 2025-08-08',
-    imagePath: '/src/assets/projects/Watercooler talk.jpg'
-  },
-  {
-    href: 'https://music.163.com/song?id=2711243097',
-    heading: 'Morning',
-    subheading: '源乐之辉 · 2025-06-02',
-    imagePath: '/src/assets/projects/Morning.jpg'
-  },
-  {
-    href: 'https://music.163.com/song?id=2692276840',
-    heading: 'Fantasy',
-    subheading: '春の季語 · 2025-04-05',
-    imagePath: '/src/assets/projects/Fantasy.jpg'
-  },
-  {
-    href: 'https://music.163.com/song?id=2683525071',
-    heading: 'Terapy',
-    subheading: '无机体 · 2025-03-15',
-    imagePath: '/src/assets/projects/Terapy.jpg'
+const music = releases.map((r) => {
+  const isOwnRelease = r.tracks.length === 1 && r.tracks[0] === r.name
+  return {
+    href: `https://music.163.com/album?id=${r.id}`,
+    heading: r.name,
+    subheading: `${r.type} · ${r.date}`,
+    note: isOwnRelease ? undefined : `收录 ${r.tracks.join(' / ')}`,
+    cover: r.cover
   }
-]
+})
 ---
 
 <PageLayout meta={{ title: 'Home' }} wide>
@@ -137,9 +121,24 @@ const music = [
             </a>
           </div>
         </div>
-        <div class='mt-10 grid grid-cols-2 gap-x-4 gap-y-8 lg:grid-cols-4'>
-          {music.map((m) => <MusicCard {...m} />)}
-        </div>
+        <music-scroller class='mt-10 block'>
+          <div class='scroller-controls'>
+            <span class='scroller-count'>{music.length} releases</span>
+            <div class='flex gap-x-2'>
+              <button class='scroller-btn' data-dir='-1' aria-label='Scroll left' disabled>←</button>
+              <button class='scroller-btn' data-dir='1' aria-label='Scroll right'>→</button>
+            </div>
+          </div>
+          <ul class='scroller-track'>
+            {
+              music.map((m) => (
+                <li class='scroller-item'>
+                  <MusicCard {...m} />
+                </li>
+              ))
+            }
+          </ul>
+        </music-scroller>
       </div>
     </section>
 
@@ -158,6 +157,31 @@ const music = [
     </section>
   </main>
 </PageLayout>
+
+<script>
+  class MusicScroller extends HTMLElement {
+    connectedCallback() {
+      const track = this.querySelector('.scroller-track') as HTMLElement
+      const [prev, next] = this.querySelectorAll<HTMLButtonElement>('.scroller-btn')
+      const update = () => {
+        // Small tolerance: the page is zoomed on desktop, so scroll positions are fractional
+        const max = track.scrollWidth - track.clientWidth - 8
+        prev.disabled = track.scrollLeft <= 8
+        next.disabled = track.scrollLeft >= max
+      }
+      this.querySelectorAll<HTMLButtonElement>('.scroller-btn').forEach((btn) =>
+        btn.addEventListener('click', () => {
+          const dir = Number(btn.dataset.dir)
+          track.scrollBy({ left: dir * track.clientWidth * 0.9, behavior: 'smooth' })
+        })
+      )
+      track.addEventListener('scroll', update, { passive: true })
+      window.addEventListener('resize', update)
+      update()
+    }
+  }
+  if (!customElements.get('music-scroller')) customElements.define('music-scroller', MusicScroller)
+</script>
 
 <style>
   .wrap {
@@ -262,6 +286,68 @@ const music = [
   .block-blue {
     background-color: hsl(var(--block-blue));
     color: hsl(0 0% 100%);
+  }
+
+  /* Music scroller */
+  .scroller-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  .scroller-count {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+  .scroller-btn {
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 2px solid currentColor;
+    font-weight: 700;
+    font-size: 1.1rem;
+    transition:
+      background-color 0.15s,
+      color 0.15s,
+      opacity 0.15s;
+  }
+  .scroller-btn:hover:not(:disabled) {
+    background-color: hsl(0 0% 100%);
+    color: hsl(var(--block-blue));
+  }
+  .scroller-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  .scroller-track {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: calc((100% - 1rem) / 2.2);
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 6px;
+    padding: 6px 6px 1.25rem;
+    margin-inline: -6px;
+    scrollbar-width: thin;
+    scrollbar-color: hsl(0 0% 100% / 0.6) transparent;
+    overscroll-behavior-x: contain;
+  }
+  @media (min-width: 640px) {
+    .scroller-track {
+      grid-auto-columns: calc((100% - 3rem) / 3.3);
+    }
+  }
+  @media (min-width: 1024px) {
+    .scroller-track {
+      grid-auto-columns: calc((100% - 4.5rem) / 4.5);
+      gap: 1.25rem;
+    }
+  }
+  .scroller-item {
+    scroll-snap-align: start;
   }
 
   /* Post list */

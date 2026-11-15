@@ -7,25 +7,37 @@ interface Props {
   href: string
   heading: string
   subheading: string
-  imagePath: string
+  /** Extra line, e.g. the ZeroHour track on a compilation */
+  note?: string
+  /** File name in src/assets/music */
+  cover: string
 }
 
-const { href, heading, subheading, imagePath } = Astro.props
-const images = import.meta.glob<{ default: ImageMetadata }>(
-  '/src/assets/projects/*.{jpeg,jpg,png,gif,avif,webp}'
+const { href, heading, subheading, note, cover } = Astro.props
+const covers = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/music/*.{jpeg,jpg,png,webp}'
 )
-if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in src/assets/projects`)
+const coverPath = `/src/assets/music/${cover}`
+if (!covers[coverPath]) throw new Error(`"${coverPath}" does not exist`)
 ---
 
 <a class='music-card group' href={href} target='_blank'>
   <div class='cover'>
-    <Image src={images[imagePath]()} alt={heading} class='cover-img' loading='lazy' />
+    <Image
+      src={covers[coverPath]()}
+      alt={heading}
+      class='cover-img'
+      widths={[240, 480]}
+      sizes='(min-width: 1024px) 240px, 45vw'
+      loading='lazy'
+    />
     <span class='play' aria-hidden='true'>
       <svg viewBox='0 0 24 24' fill='currentColor'><path d='M8 5.5v13l11-6.5z'></path></svg>
     </span>
   </div>
   <p class='title'>{heading}</p>
   <p class='meta'>{subheading}</p>
+  {note && <p class='meta note'>{note}</p>}
 </a>
 
 <style>
@@ -92,6 +104,13 @@ if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in src/as
     text-decoration: underline;
     text-decoration-thickness: 2px;
     text-underline-offset: 4px;
+  }
+  .note {
+    margin-top: 0.1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
   .meta {
     margin-top: 0.2rem;
