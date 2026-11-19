@@ -4,14 +4,18 @@
   src: url('/fonts/inter-latin-wght.woff2') format('woff2-variations');
   font-weight: 100 900;
   font-style: normal;
-  font-display: swap;
+  /* Keep text invisible for up to ~100ms while the (preloaded) font arrives, then
+     fall back; avoids the visible thin-to-bold swap on page load */
+  font-display: optional;
 }
 @font-face {
   font-family: 'Inter Tight';
   src: url('/fonts/inter-tight-latin-wght.woff2') format('woff2-variations');
   font-weight: 100 900;
   font-style: normal;
-  font-display: swap;
+  /* Keep text invisible for up to ~100ms while the (preloaded) font arrives, then
+     fall back; avoids the visible thin-to-bold swap on page load */
+  font-display: optional;
 }
 :root {
   /* Max width of the page container (header, content, footer) */
