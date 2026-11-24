@@ -54,6 +54,8 @@ https://arxiv.org/pdf/2608.01315
 - 借鉴 LLM 的 in-context learning，在生成之前，先把兴趣相似的其他用户的行为当作上下文交给模型
 - 难点在于检索要能对各种用户都检索得准，把记忆接进现有模型的方式要高效，不能拖慢推理
 
+> 其实感觉生成式的话有的不训大模型，也不微调也直接拿来用，然后加 ICL 或者是直接提示词；有的训模型，包括全参数重训练或者是 PEFT 或者是指令微调。这篇就在后者基础上也上 ICL 吧。
+
 #### Method
 
 ![frame](omega-2608.01315/omega_model.png)
@@ -73,3 +75,15 @@ https://arxiv.org/pdf/2608.01315
     - 当前用户的序列照常过 encoder，得到 Q。
     - 然后 Attention，门控后的 K 条记忆作为 K 和 V
     - 输出长度和 Q 一样，所以后面的 decoder 不用改，照常生成 4 个 token 的 SID
+
+### MiniOneRec
+
+https://arxiv.org/pdf/2510.24431
+
+> 照着 OneRec 来的，因为当时还没有 OpenOneRec。个人感觉 OpenOneRec 看起来更优雅一点，毕竟保留了大模型的能力。但是 MiniOneRec 方便复现
+
+#### Motivation
+
+- 解决了一个问题：OneRec 在公开数据集上 scaling 还好不好使？传统推荐参数都在 emb 表里，scale 不起来，但是 sid 了之后进入 transformer 了，就能 scale 了
+
+#### Method
